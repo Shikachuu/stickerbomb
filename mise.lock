@@ -1,0 +1,11 @@
+[[tools.kubeconform]]
+version = "0.7.0"
+backend = "aqua:yannh/kubeconform"
+
+[[tools.kubectl]]
+version = "1.34.2"
+backend = "aqua:kubernetes/kubernetes/kubectl"
+
+[[tools.rust]]
+version = "1.92.0"
+backend = "core:rust"

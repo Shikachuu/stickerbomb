@@ -1,0 +1,22 @@
+[tools]
+"rust" = { version = "1.92.0", profile = "default" }
+"kubectl" = "1.34.2"
+"kubeconform" = "0.7.0"
+
+[settings]
+lockfile = true
+auto_install = true
+experimental = true
+task_output = "quiet"
+
+[tasks.build]
+run = "cargo build --all"
+
+[tasks.fmt]
+run = "cargo fmt --all"
+
+[tasks.lint]
+run = "cargo clippy --all --all-targets --all-features -- -D warnings"
+
+[tasks.crdgen]
+run = "cargo run --bin crdgen"
