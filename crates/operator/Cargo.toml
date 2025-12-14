@@ -1,0 +1,22 @@
+[package]
+name = "stickerbomb"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+authors.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+stickerbomb-crd.workspace = true
+
+kube = { workspace = true, features = ["derive"] }
+k8s-openapi.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+anyhow = "1.0.100"
+thiserror = "2.0.17"
+tokio = { version = "1.48.0", features = ["full"] }
