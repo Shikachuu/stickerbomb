@@ -11,7 +11,7 @@ spec:
     shortNames:
     - doc
     singular: labeler
-  scope: Cluster
+  scope: Namespaced
   versions:
   - additionalPrinterColumns: []
     name: v1alpha1
@@ -25,86 +25,66 @@ spec:
               labels:
                 additionalProperties:
                   type: string
-                description: List of labels to apply
+                description: List of labels to apply (must contain at least one label)
                 type: object
-              rego_condition:
+              rego:
                 description: Contains the labeling policy described in Rego
                 nullable: true
+                properties:
+                  policy:
+                    description: Policy defines the rego policy that will be used in the engine
+                    maxLength: 65536
+                    minLength: 1
+                    type: string
+                  query:
+                    description: Query defines the rego query the engine will evaluate
+                    maxLength: 1024
+                    minLength: 1
+                    type: string
+                required:
+                - policy
+                - query
+                type: object
+              resourceApi:
+                description: Describes the target api group of the target resource (e.g., "v1", "apps/v1", "cert-manager.io/v1")
+                maxLength: 253
+                minLength: 1
+                pattern: ^([a-z0-9]([a-z0-9.-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9-]*[a-z0-9])?$
                 type: string
-              resource_api:
-                description: Describes the target api group of the target resource
-                type: string
-              resource_kind:
-                description: Describes the target kind of the target resource
+              resourceKind:
+                description: Describes the target kind of the target resource (e.g., "Pod", "Deployment")
+                maxLength: 63
+                minLength: 1
+                pattern: ^[A-Z][a-zA-Z0-9]*$
                 type: string
             required:
             - labels
-            - resource_api
-            - resource_kind
+            - resourceApi
+            - resourceKind
             type: object
           status:
             description: State object for the `Labeler` CRD
             nullable: true
             properties:
-              conditions:
-                description: Standard Kubernetes conditions (Ready, Error, etc.)
-                items:
-                  description: Condition contains details for one aspect of the current state of this API Resource.
-                  properties:
-                    lastTransitionTime:
-                      description: lastTransitionTime is the last time the condition transitioned from one status to another. This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
-                      format: date-time
-                      type: string
-                    message:
-                      description: message is a human readable message indicating details about the transition. This may be an empty string.
-                      type: string
-                    observedGeneration:
-                      description: observedGeneration represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.
-                      format: int64
-                      type: integer
-                    reason:
-                      description: reason contains a programmatic identifier indicating the reason for the condition's last transition. Producers of specific condition types may define expected values and meanings for this field, and whether the values are considered a guaranteed API. The value should be a CamelCase string. This field may not be empty.
-                      type: string
-                    status:
-                      description: status of the condition, one of True, False, Unknown.
-                      type: string
-                    type:
-                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
-                      type: string
-                  required:
-                  - lastTransitionTime
-                  - message
-                  - reason
-                  - status
-                  - type
-                  type: object
-                type: array
-              error:
-                description: Error message from last reconciliation attempt, if any
-                nullable: true
-                type: string
-              last_reconcile_time:
-                description: Timestamp of the last successful reconciliation
-                format: date-time
-                nullable: true
-                type: string
-              resources_labeled:
+              resourcesLabeled:
                 description: Number of resources labeled in last reconciliation
                 format: int32
+                minimum: 0.0
                 type: integer
-              resources_matched:
+              resourcesMatched:
                 description: Number of resources that matched resource_kind
                 format: int32
+                minimum: 0.0
                 type: integer
-              resources_skipped:
+              resourcesSkipped:
                 description: Number of resources failed the rego condition evaluation
                 format: int32
+                minimum: 0.0
                 type: integer
             required:
-            - conditions
-            - resources_labeled
-            - resources_matched
-            - resources_skipped
+            - resourcesLabeled
+            - resourcesMatched
+            - resourcesSkipped
             type: object
         required:
         - spec

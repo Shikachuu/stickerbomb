@@ -3,3 +3,4 @@
 pub mod v1_alpha1;
 
 pub use v1_alpha1::Labeler;
+pub use v1_alpha1::LabelerStatus;
