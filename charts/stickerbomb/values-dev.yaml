@@ -1,0 +1,23 @@
+image:
+  repository: stickerbomb
+  pullPolicy: Always
+  tag: ""
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+livenessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+readinessProbe:
+  initialDelaySeconds: 3
+  periodSeconds: 3
+
+operator:
+  logLevel: debug

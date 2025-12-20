@@ -1,0 +1,25 @@
+stickerbomb operator installed successfully!
+
+To create a Labeler resource:
+
+  kubectl apply -f - <<EOF
+  apiVersion: stickerbomb.dev/v1alpha1
+  kind: Labeler
+  metadata:
+    name: example
+    namespace: {{ .Release.Namespace }}
+  spec:
+    resourceApi: "v1"
+    resourceKind: "Pod"
+    labels:
+      managed-by: stickerbomb
+  EOF
+
+View operator logs:
+
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "stickerbomb.name" . }} -f
+
+Debug endpoint:
+
+  kubectl port-forward -n {{ .Release.Namespace }} deployment/{{ include "stickerbomb.fullname" . }} 8080:8080
+  curl http://localhost:8080/
