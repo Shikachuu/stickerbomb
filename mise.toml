@@ -1,7 +1,12 @@
 [tools]
 "rust" = { version = "1.92.0", profile = "default" }
+"helm" = "4.0.1"
+"yq" = "4.50.1"
 "kubectl" = "1.34.2"
 "kubeconform" = "0.7.0"
+
+[vars]
+chart_dir = "{{config_root}}/charts/stickerbomb"
 
 [settings]
 lockfile = true
@@ -18,5 +23,22 @@ run = "cargo fmt --all"
 [tasks.lint]
 run = "cargo clippy --all --all-targets --all-features -- -D warnings"
 
-[tasks.crdgen]
+[tasks.helm-version]
+hide = true
+silent = true
+run = "yq eval -i \".appVersion = \\\"$(yq eval '.workspace.package.version' Cargo.toml)\\\"\" {{vars.chart_dir}}/Chart.yaml"
+sources = ["Cargo.toml"]
+outputs = ["{{vars.chart_dir}}/Chart.yaml"]
+
+[tasks.generate-crds]
+hide = true
+silent = true
+env = { CRDS_DIR = "{{vars.chart_dir}}/crds" }
 run = "cargo run --bin crdgen"
+sources = ["crates/crds/src/**/*.rs"]
+outputs = ["{{vars.chart_dir}}/crds/*.yaml"]
+
+[tasks.update-helm]
+alias = "uh"
+description = "Updates the stickerbomb helm chart's application version and CRDs based on changes in the rust code."
+depends = ["helm-version", "generate-crds"]

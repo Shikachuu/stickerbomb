@@ -1,3 +1,8 @@
+[[tools.helm]]
+version = "4.0.1"
+backend = "aqua:helm/helm"
+"platforms.macos-arm64" = { checksum = "sha256:8e0b9615cf72a62faaa0cfc0e22115f05bcddfd3d7ee58406ef97bc1ba563ae8", url = "https://get.helm.sh/helm-v4.0.1-darwin-arm64.tar.gz"}
+
 [[tools.kubeconform]]
 version = "0.7.0"
 backend = "aqua:yannh/kubeconform"
@@ -9,3 +14,8 @@ backend = "aqua:kubernetes/kubernetes/kubectl"
 [[tools.rust]]
 version = "1.92.0"
 backend = "core:rust"
+
+[[tools.yq]]
+version = "4.50.1"
+backend = "aqua:mikefarah/yq"
+"platforms.macos-arm64" = { checksum = "sha256:589cd3e27b2a0ae62fc4513c7d18db56203aaf88bf7c480f0cb3d4f4d0ac5514", url = "https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_darwin_arm64"}
