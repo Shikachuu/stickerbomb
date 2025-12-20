@@ -1,0 +1,31 @@
+apiVersion: stickerbomb.dev/v1alpha1
+kind: Labeler
+metadata:
+  name: label-all-pods
+  namespace: default
+spec:
+  resourceApi: "v1"
+  resourceKind: "Pod"
+  labels:
+    environment: development
+---
+apiVersion: stickerbomb.dev/v1alpha1
+kind: Labeler
+metadata:
+  name: label-pod-labelers
+  namespace: default
+spec:
+  resourceApi: "stickerbomb.dev/v1alpha1"
+  resourceKind: "Labeler"
+  labels:
+    labeler-target: pod
+  rego:
+    policy: |
+      package stickerbomb
+
+      default allow = false
+
+      allow {
+        input.spec.resourceKind == "Pod"
+      }
+    query: "data.stickerbomb.allow"
