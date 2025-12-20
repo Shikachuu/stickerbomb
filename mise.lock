@@ -3,6 +3,11 @@ version = "4.0.1"
 backend = "aqua:helm/helm"
 "platforms.macos-arm64" = { checksum = "sha256:8e0b9615cf72a62faaa0cfc0e22115f05bcddfd3d7ee58406ef97bc1ba563ae8", url = "https://get.helm.sh/helm-v4.0.1-darwin-arm64.tar.gz"}
 
+[[tools.k3d]]
+version = "5.8.3"
+backend = "aqua:k3d-io/k3d"
+"platforms.macos-arm64" = { checksum = "sha256:8da468daa7dc7cf7cdd4735f90a9bb05179fa27858250f62e3d8cdf5b5ca0698", url = "https://github.com/k3d-io/k3d/releases/download/v5.8.3/k3d-darwin-arm64"}
+
 [[tools.kubeconform]]
 version = "0.7.0"
 backend = "aqua:yannh/kubeconform"
@@ -14,6 +19,11 @@ backend = "aqua:kubernetes/kubernetes/kubectl"
 [[tools.rust]]
 version = "1.92.0"
 backend = "core:rust"
+
+[[tools.tilt]]
+version = "0.36.0"
+backend = "aqua:tilt-dev/tilt"
+"platforms.macos-arm64" = { checksum = "sha256:2e7c99c07d9a06ba8b76bc758c8808f263e12356ea88bba7438f61832e9963df", url = "https://github.com/tilt-dev/tilt/releases/download/v0.36.0/tilt.0.36.0.mac.arm64.tar.gz"}
 
 [[tools.yq]]
 version = "4.50.1"

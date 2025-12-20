@@ -4,6 +4,8 @@
 "yq" = "4.50.1"
 "kubectl" = "1.34.2"
 "kubeconform" = "0.7.0"
+"k3d" = "5.8.3"
+"tilt" = "0.36.0"
 
 [vars]
 chart_dir = "{{config_root}}/charts/stickerbomb"
@@ -13,6 +15,7 @@ lockfile = true
 auto_install = true
 experimental = true
 task_output = "quiet"
+quiet = true
 
 [tasks.build]
 run = "cargo build --all"
@@ -25,14 +28,12 @@ run = "cargo clippy --all --all-targets --all-features -- -D warnings"
 
 [tasks.helm-version]
 hide = true
-silent = true
 run = "yq eval -i \".appVersion = \\\"$(yq eval '.workspace.package.version' Cargo.toml)\\\"\" {{vars.chart_dir}}/Chart.yaml"
 sources = ["Cargo.toml"]
 outputs = ["{{vars.chart_dir}}/Chart.yaml"]
 
 [tasks.generate-crds]
 hide = true
-silent = true
 env = { CRDS_DIR = "{{vars.chart_dir}}/crds" }
 run = "cargo run --bin crdgen"
 sources = ["crates/crds/src/**/*.rs"]
@@ -42,3 +43,12 @@ outputs = ["{{vars.chart_dir}}/crds/*.yaml"]
 alias = "uh"
 description = "Updates the stickerbomb helm chart's application version and CRDs based on changes in the rust code."
 depends = ["helm-version", "generate-crds"]
+
+[tasks.dev]
+alias = "d"
+description = "Start development environment with k3d and Tilt"
+run = "bash scripts/dev.sh"
+
+[tasks.dev-down]
+alias = "dd"
+run = ["k3d cluster delete stickerbomb"]
