@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Shikachuu/stickerbomb/main/schemas/labeler_v1alpha1.json
 apiVersion: stickerbomb.dev/v1alpha1
 kind: Labeler
 metadata:
@@ -9,6 +10,7 @@ spec:
   labels:
     environment: development
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Shikachuu/stickerbomb/main/schemas/labeler_v1alpha1.json
 apiVersion: stickerbomb.dev/v1alpha1
 kind: Labeler
 metadata:
