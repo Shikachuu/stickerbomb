@@ -1,0 +1,59 @@
+# Stickerbomb
+
+Stickerbomb is a kubernetes operator for labeling resources, imagine like putting little stickers on them, hence the name.
+
+The use cases stickerbomb is made for:
+
+- Statically labeling tons of freshly deployed or **already existing** resources.
+  ("I want to have `istio-injection: enabled` label on all my namespaces.")
+- Dynamically labeling tons of various resources based on the object's json schema.
+  ("I want to have `image-source: quay` label on my pods that has a container image downloaded from quay.")
+- Very complex use cases where you wish to label resources based on complex rego conditions.
+  ("I want to have `component: networking` on all resources that has an open port that identifies a networking resource for example `53` for dns.")
+
+## Getting started
+
+- Install the official helm chart to your cluster. (Wait for the tests to pass, it will make sure stickerbomb can actually label stuff.)
+- Get some context on the target resource you wish to label. Stikerbomb uses you the target resource's json object as input for your rego conditions,
+  it's always a great idea to have some solid understaindg of the data you can use, run `kubectl get <resourceKind> <objectName> -o json` to check the json representation.
+- Create a `Labeler` resource, you can find plenty of examples in the `examples` directory.
+- Check the reconcile loop's status from events `kubectl events` or from logs.
+
+## Internals
+
+The main goal of this project to conditionally or unconditionally label any kubernetes resource that you can define in CRDs.
+CRDs are an excelent way of providing a declarative configuration resource with strict validation with an operator that runs
+a reconcile loop very often will prevent state drifts, so it's not a label once and hope it stays there model, this makes Stickerbomb a perfect GitOps capable operator.
+
+Rust has been choosen as the primary language because of the maturity in the K8s ecosystem, esepically `kube-rs`,
+while `kubert` would have been a great alternative, it's not made for write heavy operators.
+
+Helm is our primary templating/distribution tool of choice, it has some great CRD capabilities and support for OCI registries and provenance checking.
+
+Mise is used as a Makefile replacement and dependency management tool, it provides great support for various shell environments in unix systems with really grate task capabilites.
+
+## Configuration
+
+Stickerbomb was made to ship as a helm chart, so all the configuration paramteres for the operator sits in the `values.yaml` file, even the local development uses helm.
+
+## Observability
+
+Stickerbomb has opentelemetry traces and logs.
+
+You can use structured logging with json by switching `operator.logFormat` to `json` in the values file and change the level by modifying `operator.logLevel`.
+
+You can use the opentelemtry traces by setting the envrionment variable `OTEL_EXPORTER_OTLP_ENDPOINT` from the semantic convention in the values file.
+To provide a more streamlined interface for this you can set the value of this env var by changing `operator.otel.endpoint` in the values file too.
+
+## Security
+
+- We provide signed helm releases in Github's OCI repository with signed images as well.
+- By default stickerbomb ships as a rootless and distroless container do minimize the risk of CVEs in container images.
+  While it limits our debugging capabilites provides a solid base.
+- For every release we provide SBOMs so you can continously check for CVEs any point in time for your running release.
+  (Both for the binary and for the container images.)
+- The helm chart is sipped with a strick network policy that will always be installed if you have the `NetworkPolicy` capability in your cluster.
+  It denies every egress and ingress calls from the pod except egress to port `443` and `53` targeting the `kube-system` namespace and ingress traffic on `8080`.
+- The operator's deployment always run as non-root with fully dropped capabilites!
+- Stickerbomb ships with it's own service account wiht cluster role bindings, by default however the operator can patch ANY resources in the cluster.
+  You can limit the resources it can access by switching `clusterRole.strict` to true and adding your rules to `clusterRole.rules`.
