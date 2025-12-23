@@ -1,0 +1,288 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Stickerbomb Helm Chart Values",
+  "description": "Schema for stickerbomb Helm chart values",
+  "properties": {
+    "replicaCount": {
+      "type": "integer",
+      "description": "Number of replicas for the stickerbomb deployment",
+      "const": 1
+    },
+    "image": {
+      "type": "object",
+      "description": "Container image configuration",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "description": "Container image repository",
+          "default": "ghcr.io/shikachuu/stickerbomb"
+        },
+        "pullPolicy": {
+          "type": "string",
+          "description": "Image pull policy",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "default": "IfNotPresent"
+        },
+        "tag": {
+          "type": "string",
+          "description": "Overrides the image tag whose default is the chart appVersion",
+          "default": ""
+        }
+      },
+      "required": ["repository", "pullPolicy"],
+      "additionalProperties": false
+    },
+    "imagePullSecrets": {
+      "type": "array",
+      "description": "Secrets for pulling images from private registries",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["name"]
+      },
+      "default": []
+    },
+    "nameOverride": {
+      "type": "string",
+      "description": "Override the name of the chart",
+      "default": ""
+    },
+    "fullnameOverride": {
+      "type": "string",
+      "description": "Override the full name of the release",
+      "default": ""
+    },
+    "serviceAccount": {
+      "type": "object",
+      "description": "Service account configuration",
+      "properties": {
+        "create": {
+          "type": "boolean",
+          "description": "Specifies whether a service account should be created",
+          "default": true
+        },
+        "automount": {
+          "type": "boolean",
+          "description": "Automatically mount a ServiceAccount's API credentials",
+          "default": true
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Annotations to add to the service account",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the service account to use. If not set and create is true, a name is generated using the fullname template",
+          "default": ""
+        }
+      },
+      "required": ["create", "automount"],
+      "additionalProperties": false
+    },
+    "podAnnotations": {
+      "type": "object",
+      "description": "Annotations to add to the pod",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "podLabels": {
+      "type": "object",
+      "description": "Labels to add to the pod",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "resources": {
+      "type": "object",
+      "description": "Resource limits and requests for the stickerbomb container",
+      "properties": {
+        "limits": {
+          "type": "object",
+          "description": "Resource limits",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "description": "CPU limit",
+              "pattern": "^[0-9]+(m|\\.[0-9]+)?$",
+              "default": "200m"
+            },
+            "memory": {
+              "type": "string",
+              "description": "Memory limit",
+              "pattern": "^[0-9]+(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?)?$",
+              "default": "128Mi"
+            }
+          },
+          "additionalProperties": false
+        },
+        "requests": {
+          "type": "object",
+          "description": "Resource requests",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "description": "CPU request",
+              "pattern": "^[0-9]+(m|\\.[0-9]+)?$",
+              "default": "100m"
+            },
+            "memory": {
+              "type": "string",
+              "description": "Memory request",
+              "pattern": "^[0-9]+(Ei?|Pi?|Ti?|Gi?|Mi?|Ki?)?$",
+              "default": "64Mi"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "clusterRules": {
+      "type": "object",
+      "description": "Cluster-wide RBAC rules configuration",
+      "required": ["strict"],
+      "oneOf": [
+        {
+          "description": "Strict mode disabled - rules not allowed",
+          "properties": {
+            "strict": {
+              "type": "boolean",
+              "const": false,
+              "description": "Enable strict mode for cluster rules validation"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Strict mode enabled - rules required",
+          "properties": {
+            "strict": {
+              "type": "boolean",
+              "const": true,
+              "description": "Enable strict mode for cluster rules validation"
+            },
+            "rules": {
+              "type": "array",
+              "description": "List of Kubernetes API resources to watch and manage",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "apiGroups": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["apiGroups", "resources"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["strict", "rules"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "nodeSelector": {
+      "type": "object",
+      "description": "Node selector for pod assignment",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "tolerations": {
+      "type": "array",
+      "description": "Tolerations for pod assignment",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "operator": {
+            "type": "string",
+            "enum": ["Exists", "Equal"]
+          },
+          "value": {
+            "type": "string"
+          },
+          "effect": {
+            "type": "string",
+            "enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"]
+          },
+          "tolerationSeconds": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "default": []
+    },
+    "affinity": {
+      "type": "object",
+      "description": "Affinity rules for pod assignment",
+      "default": {}
+    },
+    "operator": {
+      "type": "object",
+      "description": "Operator-specific configuration",
+      "properties": {
+        "otel": {
+          "type": "object",
+          "description": "OpenTelemetry configuration",
+          "properties": {
+            "endpoint": {
+              "type": "string",
+              "description": "OpenTelemetry collector endpoint for traces and metrics",
+              "format": "uri",
+              "default": ""
+            }
+          },
+          "additionalProperties": false
+        },
+        "logLevel": {
+          "type": "string",
+          "description": "Log level",
+          "enum": ["debug", "info", "warn", "error"],
+          "default": "info"
+        },
+        "logFormat": {
+          "type": "string",
+          "description": "Log format",
+          "enum": ["json", "text"],
+          "default": "json"
+        }
+      },
+      "required": ["logLevel", "logFormat"],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "image",
+    "serviceAccount",
+    "resources",
+    "clusterRules",
+    "operator"
+  ],
+  "additionalProperties": false
+}

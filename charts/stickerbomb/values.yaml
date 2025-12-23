@@ -1,53 +1,77 @@
+# yaml-language-server: $schema=values.schema.json
+# -- Number of replicas for the stickerbomb deployment
 replicaCount: 1
 
+# -- Container image configuration
 image:
-  repository: ghcr.io/yourusername/stickerbomb
+  # -- Container image repository
+  repository: ghcr.io/shikachuu/stickerbomb
+  # -- Image pull policy
   pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion
   tag: ""
 
+# -- Secrets for pulling images from private registries
 imagePullSecrets: []
+# -- Override the name of the chart
 nameOverride: ""
+# -- Override the full name of the release
 fullnameOverride: ""
 
+# -- Service account configuration
 serviceAccount:
+  # -- Specifies whether a service account should be created
   create: true
+  # -- Automatically mount a ServiceAccount's API credentials
   automount: true
+  # -- Annotations to add to the service account
   annotations: {}
+  # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name: ""
 
+# -- Annotations to add to the pod
 podAnnotations: {}
+# -- Labels to add to the pod
 podLabels: {}
 
+# -- Resource limits and requests for the stickerbomb container
 resources:
+  # -- Resource limits
   limits:
+    # -- CPU limit
     cpu: 200m
+    # -- Memory limit
     memory: 128Mi
+  # -- Resource requests
   requests:
+    # -- CPU request
     cpu: 100m
+    # -- Memory request
     memory: 64Mi
 
-livenessProbe:
-  httpGet:
-    path: /health
-    port: 8080
-  initialDelaySeconds: 10
-  periodSeconds: 10
-  timeoutSeconds: 3
-  failureThreshold: 3
+# -- Cluster-wide RBAC rules configuration
+clusterRules:
+  # -- Enable strict mode for cluster rules validation
+  strict: false
+  # -- List of Kubernetes API resources to watch and manage
+  rules:
+    - apiGroups: ["v1"]
+      resources: ["Pod"]
 
-readinessProbe:
-  httpGet:
-    path: /health
-    port: 8080
-  initialDelaySeconds: 5
-  periodSeconds: 5
-  timeoutSeconds: 2
-  failureThreshold: 3
-
+# -- Node selector for pod assignment
 nodeSelector: {}
+# -- Tolerations for pod assignment
 tolerations: []
+# -- Affinity rules for pod assignment
 affinity: {}
 
+# -- Operator-specific configuration
 operator:
+  # -- OpenTelemetry configuration
+  otel:
+    # -- OpenTelemetry collector endpoint for traces and metrics
+    endpoint: ""
+  # -- Log level (debug, info, warn, error)
   logLevel: info
+  # -- Log format (json or text)
   logFormat: json
