@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "apiVersion": {
+      "const": "stickerbomb.dev/v1alpha1",
+      "type": "string"
+    },
+    "kind": {
+      "const": "Labeler",
+      "type": "string"
+    },
+    "metadata": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "spec": {
+      "description": "Spec object for the `Labeler` CRD",
+      "properties": {
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "List of labels to apply (must contain at least one label)",
+          "type": "object"
+        },
+        "rego": {
+          "description": "Contains the labeling policy described in Rego",
+          "nullable": true,
+          "properties": {
+            "policy": {
+              "description": "Policy defines the rego policy that will be used in the engine",
+              "maxLength": 65536,
+              "minLength": 1,
+              "type": "string"
+            },
+            "query": {
+              "description": "Query defines the rego query the engine will evaluate",
+              "maxLength": 1024,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "policy",
+            "query"
+          ],
+          "type": "object"
+        },
+        "resourceApi": {
+          "description": "Describes the target api group of the target resource (e.g., \"v1\", \"apps/v1\", \"cert-manager.io/v1\")",
+          "maxLength": 253,
+          "minLength": 1,
+          "pattern": "^([a-z0-9]([a-z0-9.-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9-]*[a-z0-9])?$",
+          "type": "string"
+        },
+        "resourceKind": {
+          "description": "Describes the target kind of the target resource (e.g., \"Pod\", \"Deployment\")",
+          "maxLength": 63,
+          "minLength": 1,
+          "pattern": "^[A-Z][a-zA-Z0-9]*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "labels",
+        "resourceApi",
+        "resourceKind"
+      ],
+      "type": "object"
+    },
+    "status": {
+      "description": "State object for the `Labeler` CRD",
+      "nullable": true,
+      "properties": {
+        "resourcesLabeled": {
+          "description": "Number of resources labeled in last reconciliation",
+          "format": "int32",
+          "minimum": 0.0,
+          "type": "integer"
+        },
+        "resourcesMatched": {
+          "description": "Number of resources that matched `resource_kind`",
+          "format": "int32",
+          "minimum": 0.0,
+          "type": "integer"
+        },
+        "resourcesSkipped": {
+          "description": "Number of resources failed the rego condition evaluation",
+          "format": "int32",
+          "minimum": 0.0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "resourcesLabeled",
+        "resourcesMatched",
+        "resourcesSkipped"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
+  "type": "object"
+}

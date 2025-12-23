@@ -72,7 +72,7 @@ spec:
                 minimum: 0.0
                 type: integer
               resourcesMatched:
-                description: Number of resources that matched resource_kind
+                description: Number of resources that matched `resource_kind`
                 format: int32
                 minimum: 0.0
                 type: integer

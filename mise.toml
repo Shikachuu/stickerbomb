@@ -34,10 +34,10 @@ outputs = ["{{vars.chart_dir}}/Chart.yaml"]
 
 [tasks.generate-crds]
 hide = true
-env = { CRDS_DIR = "{{vars.chart_dir}}/crds" }
+env = { CRDS_DIR = "{{vars.chart_dir}}/crds", SCHEMA_DIR = "{{config_root}}/schemas" }
 run = "cargo run --bin crdgen"
 sources = ["crates/crds/src/**/*.rs"]
-outputs = ["{{vars.chart_dir}}/crds/*.yaml"]
+outputs = ["{{vars.chart_dir}}/crds/*.yaml", "{{config_root}}/schemas/*.json"]
 
 [tasks.update-helm]
 alias = "uh"
