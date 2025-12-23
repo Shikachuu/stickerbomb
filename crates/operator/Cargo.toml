@@ -23,3 +23,10 @@ tokio = { version = "1.48.0", features = ["full"] }
 futures = "0.3.31"
 actix-web = "4.12.1"
 regorus = "0.5.0"
+tracing = { version = "0.1.44", features = ["attributes"] }
+tracing-subscriber = { version = "0.3.22", features = ["env-filter", "json"] }
+opentelemetry = { version = "0.31.0", features = ["trace"] }
+opentelemetry_sdk = { version = "0.31.0", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.31.0", default-features = false, features = ["trace", "grpc-tonic"] }
+tracing-opentelemetry = "0.32.0"
+opentelemetry-resource-detectors = "0.10.0"

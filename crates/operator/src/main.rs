@@ -3,11 +3,8 @@
 use actix_web::{
     App, HttpRequest, HttpResponse, HttpServer, Responder, get, middleware, web::Data,
 };
-
-use crate::controller::State;
-
-mod controller;
-mod diagnostics;
+use stickerbomb::{State, run, telemetry};
+use tracing::instrument;
 
 #[get("/health")]
 async fn health(_: HttpRequest) -> impl Responder {
@@ -21,9 +18,12 @@ async fn index(c: Data<State>, _: HttpRequest) -> impl Responder {
 }
 
 #[tokio::main]
+#[instrument(level = "info", target = "operator::main", name = "main")]
 async fn main() -> anyhow::Result<()> {
+    telemetry::init()?;
+
     let state = State::default();
-    let controller = controller::run(state.clone());
+    let controller = run(state.clone());
 
     let server = HttpServer::new(move || {
         App::new()
