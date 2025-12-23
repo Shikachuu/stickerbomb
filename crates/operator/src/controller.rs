@@ -21,29 +21,6 @@ use tracing::{Span, debug, error, field, info, instrument, warn};
 
 use crate::diagnostics::Diagnostics;
 
-/// Helper function to publish a Kubernetes event
-async fn publish_event(
-    recorder: &Recorder,
-    event_type: EventType,
-    reason: impl Into<String>,
-    action: impl Into<String>,
-    note: Option<String>,
-    oref: &ObjectReference,
-) {
-    let _ = recorder
-        .publish(
-            &Event {
-                type_: event_type,
-                reason: reason.into(),
-                note,
-                action: action.into(),
-                secondary: None,
-            },
-            oref,
-        )
-        .await;
-}
-
 /// Context for our reconciler
 #[derive(Clone)]
 pub struct Context {
@@ -88,6 +65,7 @@ impl State {
 }
 
 /// Initialize the controller and shared state (given the crd is installed)
+///
 /// # Panics
 /// Will panic if kube client cannot be initialized from the environment
 #[instrument(skip(state))]
@@ -131,6 +109,7 @@ pub async fn run(state: State) {
     resource_kind = %doc.spec.resource_kind,
     has_rego_policy = doc.spec.rego.is_some(),
 ))]
+#[allow(clippy::needless_pass_by_value)]
 async fn reconcile(doc: Arc<Labeler>, ctx: Arc<Context>) -> Result<Action> {
     let name = doc.name_any();
     let oref = doc.object_ref(&());
@@ -151,16 +130,13 @@ async fn reconcile(doc: Arc<Labeler>, ctx: Arc<Context>) -> Result<Action> {
     let (api, ar) = discover_target_resources(&doc, &ctx.client).await?;
     let resources = api.list(&ListParams::default()).await?;
 
-    let total_resources = resources.items.len();
-    info!(
-        total_resources = total_resources,
-        "discovered target resources"
-    );
+    let total = i32::try_from(resources.items.len())?;
+    info!(total_resources = total, "discovered target resources");
 
     let mut engine = regorus::Engine::new();
     let rego = doc.spec.rego.clone();
 
-    handle_rego_rule(&mut engine, rego.clone(), uid)?;
+    handle_rego_rule(&mut engine, rego.as_ref(), uid)?;
 
     let mut resources_labeled = 0;
     let mut resources_skipped = 0;
@@ -230,8 +206,6 @@ async fn reconcile(doc: Arc<Labeler>, ctx: Arc<Context>) -> Result<Action> {
         }
     }
 
-    let total = i32::try_from(resources.items.len())?;
-
     {
         let mut state = ctx.state.write().await;
         state.resources_matched = total;
@@ -274,6 +248,7 @@ async fn reconcile(doc: Arc<Labeler>, ctx: Arc<Context>) -> Result<Action> {
     labeler_namespace = object.namespace().as_deref(),
     error_type = ?err,
 ))]
+#[allow(clippy::needless_pass_by_value)]
 fn error_policy(object: Arc<Labeler>, err: &Error, ctx: Arc<Context>) -> Action {
     let err_msg = err.to_string();
 
@@ -377,7 +352,7 @@ fn patch_resource_labels(labeler: &Labeler, meta: &ObjectMeta) -> Option<serde_j
 /// # Errors
 ///
 /// This function will return an error if it fails to add the rego rule to the engine.
-fn handle_rego_rule(engine: &mut Engine, rule: Option<RegoRule>, uid: &str) -> Result<()> {
+fn handle_rego_rule(engine: &mut Engine, rule: Option<&RegoRule>, uid: &str) -> Result<()> {
     let Some(rule) = rule else {
         return Ok(());
     };
@@ -385,9 +360,32 @@ fn handle_rego_rule(engine: &mut Engine, rule: Option<RegoRule>, uid: &str) -> R
     let path = format!("{uid}.rego");
 
     if !engine.get_policies()?.iter().any(|r| *r.get_path() == path) {
-        engine.add_policy(path, rule.policy)?;
+        engine.add_policy(path, rule.policy.clone())?;
         info!("rego policy loaded successfully");
     }
 
     Ok(())
+}
+
+/// Helper function to publish a Kubernetes event
+async fn publish_event(
+    recorder: &Recorder,
+    event_type: EventType,
+    reason: impl Into<String>,
+    action: impl Into<String>,
+    note: Option<String>,
+    oref: &ObjectReference,
+) {
+    let _ = recorder
+        .publish(
+            &Event {
+                type_: event_type,
+                reason: reason.into(),
+                note,
+                action: action.into(),
+                secondary: None,
+            },
+            oref,
+        )
+        .await;
 }

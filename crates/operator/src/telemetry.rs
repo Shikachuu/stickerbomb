@@ -19,7 +19,8 @@ use tracing_subscriber::{
     EnvFilter, Layer, Registry, layer::SubscriberExt, util::SubscriberInitExt,
 };
 
-///  Fetch an opentelemetry::trace::TraceId as hex through the full tracing stack
+///  Fetch an `opentelemetry::trace::TraceId` as hex through the full tracing stack
+#[must_use]
 pub fn get_trace_id() -> TraceId {
     tracing::Span::current()
         .context()
