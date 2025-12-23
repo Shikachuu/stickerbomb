@@ -6,7 +6,7 @@ use kube::CustomResource;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-/// RegoRule represents the optional rego policy and query for the condition evaluation
+/// `RegoRule` represents the optional rego policy and query for the condition evaluation
 #[derive(Deserialize, Serialize, Clone, Debug, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct RegoRule {
@@ -28,7 +28,9 @@ pub struct RegoRule {
 pub struct LabelerSpec {
     /// Describes the target api group of the target resource (e.g., "v1", "apps/v1", "cert-manager.io/v1")
     #[schemars(length(min = 1, max = 253))]
-    #[schemars(regex(pattern = r"^([a-z0-9]([a-z0-9.-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9-]*[a-z0-9])?$"))]
+    #[schemars(regex(
+        pattern = r"^([a-z0-9]([a-z0-9.-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9-]*[a-z0-9])?$"
+    ))]
     pub resource_api: String,
     /// Describes the target kind of the target resource (e.g., "Pod", "Deployment")
     #[schemars(length(min = 1, max = 63))]
@@ -45,7 +47,7 @@ pub struct LabelerSpec {
 #[derive(Deserialize, Serialize, Clone, Default, Debug, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerStatus {
-    /// Number of resources that matched resource_kind
+    /// Number of resources that matched `resource_kind`
     #[schemars(range(min = 0))]
     pub resources_matched: i32,
     /// Number of resources labeled in last reconciliation

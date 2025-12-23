@@ -6,6 +6,7 @@ use std::{fs::File, io::Write, path};
 use kube::CustomResourceExt;
 use stickerbomb_crd::Labeler;
 
+#[allow(clippy::unwrap_used)]
 fn main() {
     let labeler_schema = serde_yaml::to_string(&Labeler::crd()).unwrap();
     let labeler_crd_path =
