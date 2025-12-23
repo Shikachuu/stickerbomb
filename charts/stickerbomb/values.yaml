@@ -52,7 +52,7 @@ resources:
 # -- Cluster-wide RBAC rules configuration
 clusterRules:
   # -- Enable strict mode for cluster rules validation
-  strict: false
+  strict: true
   # -- List of Kubernetes API resources to watch and manage
   rules:
     - apiGroups: ["v1"]
@@ -67,10 +67,6 @@ affinity: {}
 
 # -- Operator-specific configuration
 operator:
-  # -- OpenTelemetry configuration
-  otel:
-    # -- OpenTelemetry collector endpoint for traces and metrics
-    endpoint: ""
   # -- Log level (debug, info, warn, error)
   logLevel: info
   # -- Log format (json or text)

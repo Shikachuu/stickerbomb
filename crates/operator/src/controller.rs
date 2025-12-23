@@ -109,7 +109,7 @@ pub async fn run(state: State) {
     resource_kind = %doc.spec.resource_kind,
     has_rego_policy = doc.spec.rego.is_some(),
 ))]
-#[allow(clippy::needless_pass_by_value)]
+#[allow(clippy::needless_pass_by_value, clippy::too_many_lines)]
 async fn reconcile(doc: Arc<Labeler>, ctx: Arc<Context>) -> Result<Action> {
     let name = doc.name_any();
     let oref = doc.object_ref(&());
