@@ -1,3 +1,12 @@
+# yaml-language-server: $schema=values.schema.json
+serviceAccount:
+  create: true
+  automount: true
+  name: "stickerbomb"
+
+clusterRules:
+  strict: false
+
 image:
   repository: stickerbomb
   pullPolicy: Always
@@ -11,14 +20,6 @@ resources:
     cpu: 100m
     memory: 64Mi
 
-livenessProbe:
-  initialDelaySeconds: 5
-  periodSeconds: 5
-
-readinessProbe:
-  initialDelaySeconds: 3
-  periodSeconds: 3
-
 operator:
   logLevel: debug
-  logFormat: fmt
+  logFormat: text
