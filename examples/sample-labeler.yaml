@@ -25,7 +25,7 @@ spec:
 
       default allow = false
 
-      allow {
+      allow if {
         input.spec.resourceKind == "Pod"
       }
     query: "data.stickerbomb.allow"
