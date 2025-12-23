@@ -21,3 +21,4 @@ readinessProbe:
 
 operator:
   logLevel: debug
+  logFormat: fmt

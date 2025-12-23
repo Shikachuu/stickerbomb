@@ -50,3 +50,4 @@ affinity: {}
 
 operator:
   logLevel: info
+  logFormat: json
