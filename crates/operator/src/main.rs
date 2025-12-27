@@ -42,7 +42,7 @@ async fn main() -> anyhow::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use actix_web::{test, App};
+    use actix_web::{App, test};
 
     #[actix_web::test]
     async fn test_health_endpoint() {
@@ -60,12 +60,8 @@ mod tests {
     #[actix_web::test]
     async fn test_index_endpoint() {
         let state = State::default();
-        let app = test::init_service(
-            App::new()
-                .app_data(Data::new(state.clone()))
-                .service(index),
-        )
-        .await;
+        let app =
+            test::init_service(App::new().app_data(Data::new(state.clone())).service(index)).await;
 
         let req = test::TestRequest::get().uri("/").to_request();
         let resp = test::call_service(&app, req).await;
