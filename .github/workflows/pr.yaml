@@ -34,6 +34,12 @@ jobs:
       - name: Set up mise
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
 
+        # https://github.com/jdx/mise-action/issues/215
+      - name: Make sure clippy and rustfmt are installed
+        run: |
+          export active_rust_toolchain=$(rustup show active-toolchain | cut -d' ' -f1)
+          rustup component add --toolchain ${active_rust_toolchain} rustfmt clippy
+
       - name: Lint
         run: mise lint
 
