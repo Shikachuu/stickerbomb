@@ -1,0 +1,80 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  formalities:
+    name: Validate PR formalities
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          requireScope: false
+          ignoreLabels: |
+            dependabot
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Set up mise
+        uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+
+      - name: Lint
+        run: mise lint
+
+      - name: Run CRD generate
+        run: mise generate-crds
+
+      - name: Check for changes
+        run: |
+          if ! git diff --exit-code; then
+            echo "::error::Files are not up to date. Please run mise update-helm' and commit the changes."
+            exit 1
+          fi
+
+      - name: Grype security check
+        id: grype
+        run: grype . -f medium --file grype.sarif
+        continue-on-error: true
+
+      - name: upload Grype scan SARIF report
+        if: steps.grype.outcome == 'failure'
+        uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3e5e0aa3d64366bc # v3.31.9
+        with:
+          sarif_file: grype.sarif
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Set up mise
+        uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+
+      - name: Run tests
+        run: mise test
+
+      - name: Report code coverage
+        uses: zgosalvez/github-actions-report-lcov@8ead3c903cefbc389528f5e032e793a5d0e5b626 # v5.0.2
+        with:
+          coverage-files: lcov.info
+          artifact-name: code-coverage-report
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          update-comment: true

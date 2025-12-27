@@ -2,3 +2,5 @@
 
 .tiltbuild/
 tilt_modules/
+
+lcov.info
