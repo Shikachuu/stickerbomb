@@ -6,6 +6,7 @@
 "kubeconform" = "0.7.0"
 "k3d" = "5.8.3"
 "tilt" = "0.36.0"
+"grype" = "0.104.1"
 
 [vars]
 chart_dir = "{{config_root}}/charts/stickerbomb"
