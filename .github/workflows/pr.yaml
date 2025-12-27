@@ -54,7 +54,7 @@ jobs:
 
       - name: upload Grype scan SARIF report
         if: steps.grype.outcome == 'failure'
-        uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3e5e0aa3d64366bc # v3.31.9
+        uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3f5e0aa3d64366bc # v3.31.9
         with:
           sarif_file: grype.sarif
 
@@ -67,6 +67,9 @@ jobs:
 
       - name: Set up mise
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+
+      - name: Install LCOV
+        run: sudo apt-get update && sudo apt-get install -y lcov
 
       - name: Run tests
         run: mise test

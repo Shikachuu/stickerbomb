@@ -38,3 +38,42 @@ async fn main() -> anyhow::Result<()> {
     tokio::join!(controller, server.run()).1?;
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use actix_web::{test, App};
+
+    #[actix_web::test]
+    async fn test_health_endpoint() {
+        let app = test::init_service(App::new().service(health)).await;
+        let req = test::TestRequest::get().uri("/health").to_request();
+        let resp = test::call_service(&app, req).await;
+
+        assert!(resp.status().is_success());
+        assert_eq!(resp.status(), actix_web::http::StatusCode::OK);
+
+        let body: serde_json::Value = test::read_body_json(resp).await;
+        assert_eq!(body, "healthy");
+    }
+
+    #[actix_web::test]
+    async fn test_index_endpoint() {
+        let state = State::default();
+        let app = test::init_service(
+            App::new()
+                .app_data(Data::new(state.clone()))
+                .service(index),
+        )
+        .await;
+
+        let req = test::TestRequest::get().uri("/").to_request();
+        let resp = test::call_service(&app, req).await;
+
+        assert!(resp.status().is_success());
+        assert_eq!(resp.status(), actix_web::http::StatusCode::OK);
+
+        let body: serde_json::Value = test::read_body_json(resp).await;
+        assert!(body.is_object(), "Response should be a JSON object");
+    }
+}
