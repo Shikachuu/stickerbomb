@@ -10,10 +10,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Clone, Debug, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct RegoRule {
-    /// Policy defines the rego policy that will be used in the engine
+    /// Policy defines the rego policy that will be used in the engine as context for the query
     #[schemars(length(min = 1, max = 65536))]
     pub policy: String,
-    /// Query defines the rego query the engine will evaluate
+    /// Query defines the rego query the engine will evaluate as boolean to decide if the resource
+    /// requires labeling.
+    /// Only use boolean conditions otherwise you will get a runtime error!
     #[schemars(length(min = 1, max = 1024))]
     pub query: String,
 }
@@ -26,17 +28,22 @@ pub struct RegoRule {
 #[kube(status = "LabelerStatus", shortname = "doc")]
 #[kube(namespaced)]
 pub struct LabelerSpec {
-    /// Describes the target api group of the target resource (e.g., "v1", "apps/v1", "cert-manager.io/v1")
+    /// Describes the target api group of the target resource (e.g., "v1", "apps/v1", "cert-manager.io/v1").
+    /// Use "kubectl api-resources" for a complete list of supported resources.
     #[schemars(length(min = 1, max = 253))]
     #[schemars(regex(
         pattern = r"^([a-z0-9]([a-z0-9.-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9-]*[a-z0-9])?$"
     ))]
     pub resource_api: String,
-    /// Describes the target kind of the target resource (e.g., "Pod", "Deployment")
+    /// Describes the target kind of the target resource (e.g., "Pod", "Deployment").
+    /// Use "kubectl api-resources" for a complete list of supported resources.
     #[schemars(length(min = 1, max = 63))]
     #[schemars(regex(pattern = r"^[A-Z][a-zA-Z0-9]*$"))]
     pub resource_kind: String,
-    /// Contains the labeling policy described in Rego
+    /// Contains the labeling policy described in Rego.
+    /// For refference check out [OPA's documentation on rego](https://www.openpolicyagent.org/docs/policy-language).
+    /// This operator uses [Microsoft's regorus](https://github.com/microsoft/regorus/tree/main) implementation,
+    /// you can write and test some conditions on the [regorus playground](https://anakrish.github.io/regorus-playground/).
     pub rego: Option<RegoRule>,
     /// List of labels to apply (must contain at least one label)
     #[schemars(length(min = 1))]

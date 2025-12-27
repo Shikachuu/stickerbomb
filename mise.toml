@@ -35,8 +35,6 @@ outputs = ["{{vars.chart_dir}}/Chart.yaml"]
 hide = true
 env = { CRDS_DIR = "{{vars.chart_dir}}/crds", SCHEMA_DIR = "{{config_root}}/schemas" }
 run = "cargo run --bin crdgen"
-sources = ["crates/crds/src/**/*.rs"]
-outputs = ["{{vars.chart_dir}}/crds/*.yaml", "{{config_root}}/schemas/*.json"]
 
 [tasks.update-helm]
 alias = "uh"
@@ -51,3 +49,10 @@ run = "bash scripts/dev.sh"
 [tasks.dev-down]
 alias = "dd"
 run = ["k3d cluster delete stickerbomb"]
+
+[tasks.update-rust-version]
+description = "Updates the Rust version in Cargo.toml and mise.toml based on rust-toolchain.toml"
+run = [
+    "sed -i '' -E 's/(^rust-version = \")[^\"]+(\")/\\1'\"$(yq eval '.toolchain.channel' rust-toolchain.toml)\"'\\2/' Cargo.toml",
+    "sed -i '' -E 's/(^\"rust\" = \\{ version = \")[^\"]+(\".*)/\\1'\"$(yq eval '.toolchain.channel' rust-toolchain.toml)\"'\\2/' mise.toml",
+]

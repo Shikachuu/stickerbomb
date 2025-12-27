@@ -19,7 +19,7 @@ use tracing_subscriber::{
     EnvFilter, Layer, Registry, layer::SubscriberExt, util::SubscriberInitExt,
 };
 
-///  Fetch an `opentelemetry::trace::TraceId` as hex through the full tracing stack
+/// Fetch an `opentelemetry::trace::TraceId` as hex through the full tracing stack
 #[must_use]
 pub fn get_trace_id() -> TraceId {
     tracing::Span::current()
@@ -77,4 +77,80 @@ pub fn init() -> anyhow::Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_otel_enabled_when_endpoint_set() {
+        temp_env::with_var(
+            "OTEL_EXPORTER_OTLP_ENDPOINT",
+            Some("http://localhost:4317"),
+            || {
+                assert!(is_otel_enabled());
+            },
+        );
+    }
+
+    #[test]
+    fn test_is_otel_disabled_when_endpoint_not_set() {
+        temp_env::with_var_unset("OTEL_EXPORTER_OTLP_ENDPOINT", || {
+            assert!(!is_otel_enabled());
+        });
+    }
+
+    #[test]
+    fn test_resource_contains_service_name() {
+        let res = resource();
+        let attrs: Vec<_> = res.iter().collect();
+
+        // Check that service.name is set to the package name
+        let service_name = attrs
+            .iter()
+            .find(|(k, _)| k.as_str() == "service.name")
+            .map(|(_, v)| v.as_str());
+
+        assert_eq!(service_name.as_deref(), Some(env!("CARGO_PKG_NAME")));
+    }
+
+    #[test]
+    fn test_resource_contains_service_version() {
+        let res = resource();
+        let attrs: Vec<_> = res.iter().collect();
+
+        // Check that service.version is set
+        let service_version = attrs
+            .iter()
+            .find(|(k, _)| k.as_str() == "service.version")
+            .map(|(_, v)| v.as_str());
+
+        assert_eq!(service_version.as_deref(), Some(env!("CARGO_PKG_VERSION")));
+    }
+
+    #[test]
+    fn test_get_trace_id_with_otel_layer() {
+        use opentelemetry_sdk::trace::{Sampler, SdkTracerProvider};
+        use tracing_subscriber::layer::SubscriberExt;
+
+        let provider = SdkTracerProvider::builder()
+            .with_sampler(Sampler::AlwaysOn)
+            .build();
+
+        let tracer = provider.tracer("test-tracer");
+        let otel_layer = OpenTelemetryLayer::new(tracer);
+
+        let subscriber = Registry::default().with(otel_layer);
+
+        tracing::subscriber::with_default(subscriber, || {
+            let span = tracing::info_span!("test_span");
+            let _enter = span.enter();
+
+            let trace_id = get_trace_id();
+
+            assert_eq!(trace_id.to_string().len(), 32); // Trace ID should be 32 hex chars
+            assert_ne!(trace_id.to_string(), "00000000000000000000000000000000");
+        });
+    }
 }

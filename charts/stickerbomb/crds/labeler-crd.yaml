@@ -28,16 +28,23 @@ spec:
                 description: List of labels to apply (must contain at least one label)
                 type: object
               rego:
-                description: Contains the labeling policy described in Rego
+                description: |-
+                  Contains the labeling policy described in Rego.
+                  For refference check out [OPA's documentation on rego](https://www.openpolicyagent.org/docs/policy-language).
+                  This operator uses [Microsoft's regorus](https://github.com/microsoft/regorus/tree/main) implementation,
+                  you can write and test some conditions on the [regorus playground](https://anakrish.github.io/regorus-playground/).
                 nullable: true
                 properties:
                   policy:
-                    description: Policy defines the rego policy that will be used in the engine
+                    description: Policy defines the rego policy that will be used in the engine as context for the query
                     maxLength: 65536
                     minLength: 1
                     type: string
                   query:
-                    description: Query defines the rego query the engine will evaluate
+                    description: |-
+                      Query defines the rego query the engine will evaluate as boolean to decide if the resource
+                      requires labeling.
+                      Only use boolean conditions otherwise you will get a runtime error!
                     maxLength: 1024
                     minLength: 1
                     type: string
@@ -46,13 +53,17 @@ spec:
                 - query
                 type: object
               resourceApi:
-                description: Describes the target api group of the target resource (e.g., "v1", "apps/v1", "cert-manager.io/v1")
+                description: |-
+                  Describes the target api group of the target resource (e.g., "v1", "apps/v1", "cert-manager.io/v1").
+                  Use "kubectl api-resources" for a complete list of supported resources.
                 maxLength: 253
                 minLength: 1
                 pattern: ^([a-z0-9]([a-z0-9.-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9-]*[a-z0-9])?$
                 type: string
               resourceKind:
-                description: Describes the target kind of the target resource (e.g., "Pod", "Deployment")
+                description: |-
+                  Describes the target kind of the target resource (e.g., "Pod", "Deployment").
+                  Use "kubectl api-resources" for a complete list of supported resources.
                 maxLength: 63
                 minLength: 1
                 pattern: ^[A-Z][a-zA-Z0-9]*$

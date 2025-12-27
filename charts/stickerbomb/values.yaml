@@ -52,11 +52,7 @@ resources:
 # -- Cluster-wide RBAC rules configuration
 clusterRules:
   # -- Enable strict mode for cluster rules validation
-  strict: true
-  # -- List of Kubernetes API resources to watch and manage
-  rules:
-    - apiGroups: ["v1"]
-      resources: ["Pod"]
+  strict: false
 
 # -- Node selector for pod assignment
 nodeSelector: {}

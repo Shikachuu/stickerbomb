@@ -64,10 +64,11 @@ impl State {
     }
 }
 
-/// Initialize the controller and shared state (given the crd is installed)
+/// Instantiates and runs a new controller with it's dependencies from the current shared state.
 ///
 /// # Panics
-/// Will panic if kube client cannot be initialized from the environment
+///
+/// Panics if it cannot obtain a k8s api client.
 #[instrument(skip(state))]
 pub async fn run(state: State) {
     info!("initializing stickerbomb controller");
@@ -101,6 +102,15 @@ pub async fn run(state: State) {
     info!("controller shutdown complete");
 }
 
+/// Main reconcile loop for the operator, recalls reconcile every 5 mins and processes a `Labeler`
+/// instance with it's `Context`.
+/// It fetches every resource that matches the `Labeler`'s kind and api, runs the rego condition if
+/// specified and patches the resource labels if needed.
+///
+/// # Errors
+///
+/// This function will return an error if any of the k8s api calls fail, see `crate::Error` for
+/// explicit error details.
 #[instrument(skip(doc, ctx), fields(
     labeler_name = %doc.name_any(),
     labeler_namespace = doc.namespace().as_deref(),
@@ -158,48 +168,56 @@ async fn reconcile(doc: Arc<Labeler>, ctx: Arc<Context>) -> Result<Action> {
         };
 
         let patch = patch_resource_labels(&doc, &resource.metadata);
-        let needs_patch = patch.is_some();
 
-        if can_patch && needs_patch {
-            publish_event(
-                &ctx.recorder,
-                EventType::Normal,
-                "AdjustingLabels",
-                "Labeling",
-                Some(format!("Labeling {kind}: {target} with rule: {name}")),
-                &oref,
-            )
-            .await;
-
-            let patch_api = if let Some(ns) = &target_namespace {
-                Api::namespaced_with(ctx.client.clone(), ns, &ar)
-            } else {
-                api.clone()
-            };
-
-            patch_api
-                .patch(
-                    &target,
-                    &PatchParams::default(),
-                    #[allow(clippy::unwrap_used)]
-                    &Patch::Merge(patch.unwrap()),
+        if can_patch {
+            if let Some(patch_value) = patch {
+                publish_event(
+                    &ctx.recorder,
+                    EventType::Normal,
+                    "AdjustingLabels",
+                    "Labeling",
+                    Some(format!("Labeling {kind}: {target} with rule: {name}")),
+                    &oref,
                 )
-                .await?;
+                .await;
 
-            debug!(
-                target_resource = %target,
-                "successfully patched resource"
-            );
+                let patch_api = if let Some(ns) = &target_namespace {
+                    Api::namespaced_with(ctx.client.clone(), ns, &ar)
+                } else {
+                    api.clone()
+                };
 
-            resources_labeled += 1;
+                patch_api
+                    .patch(
+                        &target,
+                        &PatchParams::default(),
+                        #[allow(clippy::unwrap_used)]
+                        &Patch::Merge(patch_value),
+                    )
+                    .await?;
+
+                debug!(
+                    target_resource = %target,
+                    "successfully patched resource"
+                );
+
+                resources_labeled += 1;
+            } else {
+                debug!(
+                    target_resource = %target,
+                    target_namespace = target_namespace.as_deref(),
+                    target_kind = %kind,
+                    reason = "labels_already_applied",
+                    "skipping resource"
+                );
+                resources_skipped += 1;
+            }
         } else {
             debug!(
                 target_resource = %target,
                 target_namespace = target_namespace.as_deref(),
                 target_kind = %kind,
-                can_patch = can_patch,
-                needs_patch = needs_patch,
-                reason = if can_patch { "labels_already_applied" } else { "rego_policy_rejected" },
+                reason = "rego_policy_rejected",
                 "skipping resource"
             );
             resources_skipped += 1;
@@ -243,6 +261,8 @@ async fn reconcile(doc: Arc<Labeler>, ctx: Arc<Context>) -> Result<Action> {
     Ok(Action::requeue(Duration::from_mins(5)))
 }
 
+/// Handles any error thrown by the reconcile function by reproting it to tracing and publishing a
+/// failed event to the k8s events api, will requeue the reconcile in 1 minute.
 #[instrument(skip(object, err, ctx), fields(
     labeler_name = %object.name_any(),
     labeler_namespace = object.namespace().as_deref(),
@@ -276,6 +296,12 @@ fn error_policy(object: Arc<Labeler>, err: &Error, ctx: Arc<Context>) -> Action 
     Action::requeue(Duration::from_mins(1))
 }
 
+/// Flushes the in-memory state from `Context` to `LabelerStatus` in the k8s api.
+///
+/// # Errors
+///
+/// This function will return an error if it's unable to obtain the resource's namespace or the
+/// object unique name or if the patch or encode fails.
 #[instrument(skip(doc, ctx), fields(
     labeler_name = doc.metadata.name.as_deref(),
     labeler_namespace = doc.metadata.namespace.as_deref(),
@@ -309,6 +335,11 @@ async fn flush_state_to_api(doc: &Labeler, ctx: &Context) -> Result<Labeler> {
     Ok(result)
 }
 
+/// Fetch every resource from the k8s api with the api kind and version defined in the provided `Labeler`.
+///
+/// # Errors
+///
+/// This function will return an error if it's unabled to pin the api group or kind.
 #[instrument(skip(labeler, client), fields(
     resource_api = %labeler.spec.resource_api,
     resource_kind = %labeler.spec.resource_kind,
@@ -326,6 +357,8 @@ async fn discover_target_resources(
     Ok((Api::all_with(client.clone(), &ar), ar))
 }
 
+/// Diffs any `ObjectMeta` with labels defined in a `Labeler` and will return the
+/// diff in a k8s api format for a patch request or return `None` if there are no changes.
 fn patch_resource_labels(labeler: &Labeler, meta: &ObjectMeta) -> Option<serde_json::Value> {
     let mut labels = meta.labels.clone().unwrap_or_default();
     let needs_update = labeler
@@ -367,7 +400,8 @@ fn handle_rego_rule(engine: &mut Engine, rule: Option<&RegoRule>, uid: &str) -> 
     Ok(())
 }
 
-/// Helper function to publish a Kubernetes event
+/// Helper function to publish a Kubernetes events.
+/// Will swallow any error!
 async fn publish_event(
     recorder: &Recorder,
     event_type: EventType,
@@ -388,4 +422,164 @@ async fn publish_event(
             oref,
         )
         .await;
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeMap;
+
+    use kube::client::Body;
+
+    use super::*;
+
+    #[test]
+    fn test_patch_empty_resource_labels() {
+        let om = ObjectMeta::default();
+        let labeler = Labeler {
+            metadata: ObjectMeta::default(),
+            spec: stickerbomb_crd::v1_alpha1::LabelerSpec {
+                resource_api: "v1".to_string(),
+                resource_kind: "Pods".to_string(),
+                rego: None,
+                labels: BTreeMap::default(),
+            },
+            status: Some(LabelerStatus::default()),
+        };
+
+        assert_eq!(patch_resource_labels(&labeler, &om), None)
+    }
+
+    #[test]
+    fn test_patch_resource_labels() {
+        let mut labels = BTreeMap::new();
+        labels.insert("myLabel".to_string(), "value".to_string());
+
+        let om = ObjectMeta::default();
+        let labeler = Labeler {
+            metadata: ObjectMeta::default(),
+            spec: stickerbomb_crd::v1_alpha1::LabelerSpec {
+                resource_api: "v1".to_string(),
+                resource_kind: "Pods".to_string(),
+                rego: None,
+                labels: labels,
+            },
+            status: Some(LabelerStatus::default()),
+        };
+
+        assert_eq!(
+            patch_resource_labels(&labeler, &om),
+            Some(json!({"metadata": {"labels": {"myLabel": "value"}}}))
+        )
+    }
+
+    #[test]
+    fn test_handle_rego_rule() {
+        let mut engine = regorus::Engine::new();
+        let uid = "test";
+        let rule = RegoRule {
+            policy: r#"package stickerbomb
+default allow = false
+allow if {
+    input.spec.resourceKind == "Pod"
+}"#
+            .to_string(),
+            query: "data.stickerbomb.allow".to_string(),
+        };
+
+        assert_eq!(handle_rego_rule(&mut engine, None, uid).unwrap(), ());
+        assert_eq!(handle_rego_rule(&mut engine, Some(&rule), uid).unwrap(), ());
+        assert_eq!(engine.get_policies().unwrap().len(), 1)
+    }
+
+    #[tokio::test]
+    async fn test_discover_target_resources_with_mock() {
+        use http::{Request, Response};
+        use tower_test::mock;
+
+        let (mock_service, mut handle) = mock::pair::<Request<Body>, Response<Body>>();
+        let client = Client::new(mock_service, "default");
+
+        let labeler = Labeler {
+            metadata: ObjectMeta::default(),
+            spec: stickerbomb_crd::v1_alpha1::LabelerSpec {
+                resource_api: "v1".to_string(),
+                resource_kind: "Pod".to_string(),
+                rego: None,
+                labels: BTreeMap::default(),
+            },
+            status: Some(LabelerStatus::default()),
+        };
+
+        tokio::spawn(async move {
+            let (request, send) = handle.next_request().await.unwrap();
+            assert!(request.uri().path().contains("/api/v1"));
+
+            let api_resources = serde_json::json!({
+                "kind": "APIResourceList",
+                "apiVersion": "v1",
+                "groupVersion": "v1",
+                "resources": [{
+                    "name": "pods",
+                    "singularName": "pod",
+                    "namespaced": true,
+                    "kind": "Pod",
+                    "verbs": ["get", "list", "watch", "create", "update", "patch", "delete"]
+                }]
+            });
+
+            let response = Response::builder()
+                .status(200)
+                .body(Body::from(serde_json::to_vec(&api_resources).unwrap()))
+                .unwrap();
+
+            send.send_response(response);
+        });
+
+        let result = discover_target_resources(&labeler, &client).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_publish_event_with_mock() {
+        use http::{Request, Response};
+        use kube::runtime::events::Reporter;
+        use tower_test::mock;
+
+        let (mock_service, mut handle) = mock::pair::<Request<Body>, Response<Body>>();
+        let client = Client::new(mock_service, "default");
+
+        let reporter = Reporter {
+            controller: "test-controller".into(),
+            instance: Some("test-instance".into()),
+        };
+
+        let recorder = Recorder::new(client.clone(), reporter);
+
+        let oref = ObjectReference {
+            api_version: Some("v1".to_string()),
+            kind: Some("Labeler".to_string()),
+            name: Some("test-labeler".to_string()),
+            namespace: Some("default".to_string()),
+            uid: Some("test-uid".to_string()),
+            ..Default::default()
+        };
+
+        tokio::spawn(async move {
+            let (_request, send) = handle.next_request().await.unwrap();
+
+            let response = Response::builder().status(201).body(Body::empty()).unwrap();
+
+            send.send_response(response);
+        });
+
+        publish_event(
+            &recorder,
+            EventType::Normal,
+            "TestReason",
+            "TestAction",
+            Some("Test note".to_string()),
+            &oref,
+        )
+        .await;
+    }
 }
