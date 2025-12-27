@@ -1,3 +1,7 @@
+[[tools."cargo:cargo-llvm-cov"]]
+version = "0.6.21"
+backend = "cargo:cargo-llvm-cov"
+
 [[tools.grype]]
 version = "0.104.1"
 backend = "aqua:anchore/grype"

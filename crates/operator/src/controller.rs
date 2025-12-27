@@ -119,7 +119,7 @@ pub async fn run(state: State) {
     resource_kind = %doc.spec.resource_kind,
     has_rego_policy = doc.spec.rego.is_some(),
 ))]
-#[allow(clippy::needless_pass_by_value, clippy::too_many_lines)]
+#[allow(clippy::needless_pass_by_value)]
 async fn reconcile(doc: Arc<Labeler>, ctx: Arc<Context>) -> Result<Action> {
     let name = doc.name_any();
     let oref = doc.object_ref(&());
@@ -446,7 +446,7 @@ mod tests {
             status: Some(LabelerStatus::default()),
         };
 
-        assert_eq!(patch_resource_labels(&labeler, &om), None)
+        assert_eq!(patch_resource_labels(&labeler, &om), None);
     }
 
     #[test]
@@ -461,7 +461,7 @@ mod tests {
                 resource_api: "v1".to_string(),
                 resource_kind: "Pods".to_string(),
                 rego: None,
-                labels: labels,
+                labels,
             },
             status: Some(LabelerStatus::default()),
         };
@@ -469,7 +469,7 @@ mod tests {
         assert_eq!(
             patch_resource_labels(&labeler, &om),
             Some(json!({"metadata": {"labels": {"myLabel": "value"}}}))
-        )
+        );
     }
 
     #[test]
@@ -488,7 +488,7 @@ allow if {
 
         assert_eq!(handle_rego_rule(&mut engine, None, uid).unwrap(), ());
         assert_eq!(handle_rego_rule(&mut engine, Some(&rule), uid).unwrap(), ());
-        assert_eq!(engine.get_policies().unwrap().len(), 1)
+        assert_eq!(engine.get_policies().unwrap().len(), 1);
     }
 
     #[tokio::test]
