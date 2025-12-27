@@ -1,8 +1,8 @@
 ARG BUILD_PROFILE=release
 
-FROM --platform=$BUILDPLATFORM rust:1.92.0-bookworm as chef
+FROM --platform=$BUILDPLATFORM rust:1.92.0-slim-bookworm@sha256:376e6785918280aa68bef2d8d7b0204b58dfd486f370419023363c6e8cc09ec3 as chef
 WORKDIR /app
-RUN cargo install cargo-chef
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* && cargo install cargo-chef
 
 FROM chef AS planner
 COPY Cargo.toml Cargo.lock ./
@@ -28,7 +28,7 @@ RUN if [ "$BUILD_PROFILE" = "release" ]; then \
       cp target/debug/stickerbomb /app/stickerbomb; \
     fi
 
-FROM gcr.io/distroless/cc-debian12:nonroot
+FROM gcr.io/distroless/cc-debian12:nonroot@sha256:2575808fe33e2a728348040ef2fd6757b0200a73ca8daebd0c258e2601e76c6d
 COPY --from=builder /app/stickerbomb /usr/local/bin/stickerbomb
 EXPOSE 8080
 USER 65532:65532
