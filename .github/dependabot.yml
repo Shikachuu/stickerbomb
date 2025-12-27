@@ -1,0 +1,81 @@
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    open-pull-requests-limit: 2
+    schedule:
+      interval: weekly
+    groups:
+      security-updates:
+        applies-to: security-updates
+        update-types:
+          - minor
+          - patch
+        patterns:
+          - "*"
+      version-updates:
+        applies-to: version-updates
+        update-types:
+          - major
+        patterns:
+          - "*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    open-pull-requests-limit: 2
+    schedule:
+      interval: weekly
+    groups:
+      security-updates:
+        applies-to: security-updates
+        update-types:
+          - patch
+        patterns:
+          - "*"
+      version-updates:
+        applies-to: version-updates
+        update-types:
+          - major
+          - minor
+        patterns:
+          - "*"
+
+  - package-ecosystem: docker
+    directory: /
+    open-pull-requests-limit: 2
+    schedule:
+      interval: weekly
+    groups:
+      security-updates:
+        applies-to: security-updates
+        update-types:
+          - minor
+          - patch
+        patterns:
+          - "*"
+      version-updates:
+        applies-to: version-updates
+        update-types:
+          - major
+        patterns:
+          - "*"
+
+  - package-ecosystem: rust-toolchain
+    directory: /
+    open-pull-requests-limit: 2
+    schedule:
+      interval: weekly
+    groups:
+      security-updates:
+        applies-to: security-updates
+        update-types:
+          - minor
+          - patch
+        patterns:
+          - "*"
+      version-updates:
+        applies-to: version-updates
+        update-types:
+          - major
+        patterns:
+          - "*"
