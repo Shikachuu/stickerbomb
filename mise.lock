@@ -1,3 +1,7 @@
+[[tools."cargo:cargo-deny"]]
+version = "0.18.9"
+backend = "cargo:cargo-deny"
+
 [[tools."cargo:cargo-llvm-cov"]]
 version = "0.6.21"
 backend = "cargo:cargo-llvm-cov"
