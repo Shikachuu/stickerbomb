@@ -10,3 +10,6 @@ helm lint "$CHART_DIR"
 
 echo "👀 Validating templated helm chart with kubeconform..."
 helm template "$CHART_DIR" | kubeconform -schema-location default -schema-location schemas/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json
+
+echo "👀 Running license check..."
+cargo deny check
