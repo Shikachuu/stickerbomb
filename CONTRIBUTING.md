@@ -248,8 +248,6 @@ Reviewers should verify:
 - [ ] Error handling is appropriate
 - [ ] Performance impact is acceptable
 
-For detailed code review guidelines, see `docs/CODE_REVIEW_GUIDE.md`.
-
 ## Security
 
 ### Security Review
