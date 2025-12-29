@@ -1,6 +1,12 @@
+# Rust build output
 /target
 
+# Tilt cache and build
 .tiltbuild/
 tilt_modules/
 
+# Test coverage
 lcov.info
+
+# Packaged helm charts
+*.tgz

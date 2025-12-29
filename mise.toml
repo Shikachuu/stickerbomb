@@ -7,6 +7,7 @@
 "k3d" = "5.8.3"
 "tilt" = "0.36.0"
 "grype" = "0.104.1"
+"aqua:google/addlicense" = "1.2.0"
 "cargo:cargo-llvm-cov" = "0.6.21"
 "cargo:cargo-deny" = "0.18.9"
 
