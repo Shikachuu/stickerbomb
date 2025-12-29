@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "👀 Linting Rust codebase..."
+echo "✏️ Formatting with fmt..."
 cargo fmt --all
+
+echo "👀 Linting Rust codebase..."
 cargo clippy --all --all-targets --all-features -- -D warnings
 
 echo "👀 Linting helm chart..."
@@ -13,3 +15,6 @@ helm template "$CHART_DIR" | kubeconform -schema-location default -schema-locati
 
 echo "👀 Running license check..."
 cargo deny check
+
+echo "✏️ Writing file headers..."
+addlicense -l "apache" -s=only -c "Stickerbomb Maintainers" -ignore "**/*.toml" "crates"

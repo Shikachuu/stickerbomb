@@ -139,6 +139,7 @@ Unit tests should be fast, isolated, and avoid external dependencies. We use two
 Tests that require a real Kubernetes cluster, organized in a separate `cluster-tests/` crate.
 
 **Structure:**
+
 ```
 cluster-tests/
   tests/
@@ -149,6 +150,7 @@ cluster-tests/
 ```
 
 **Integration tests** (call reconcile directly):
+
 ```rust
 // cluster-tests/tests/integration/reconcile.rs
 #[tokio::test]
@@ -159,6 +161,7 @@ async fn test_reconcile_flow() {
 ```
 
 **E2E tests** (black-box via kubectl):
+
 ```rust
 // cluster-tests/tests/e2e/deployment.rs
 #[tokio::test]
@@ -214,21 +217,12 @@ For detailed coding standards, see `docs/CODING_STANDARDS.md`.
 
 ### License Headers
 
-All source files must include SPDX license identifier and copyright notice:
+All source files must include SPDX license identifier and copyright notice!
 
-```rust
-// SPDX-License-Identifier: Apache-2.0
-// Copyright 2024 Máté Czékus
-```
+**Automated with addlicense:** The project uses [addlicense](https://github.com/google/addlicense) to automatically add and verify license headers.
+Running `mise lint` will check and add missing headers, thanks to this missing headers will also be reported by the CI.
 
-**Automated with addlicense:** The project uses [addlicense](https://github.com/google/addlicense) to automatically add and verify license headers. Running `mise lint` will check and add missing headers.
-
-This applies to:
-
-- All `.rs` files
-- Dockerfile
-- GitHub Actions workflow files (`.github/workflows/*.yaml`)
-- Helm chart files (`charts/stickerbomb/**`)
+This applies to only non `.toml` files in the `crates` folder which contains the application code.
 
 ## Code Review Process
 
