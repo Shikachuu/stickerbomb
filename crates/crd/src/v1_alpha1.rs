@@ -1,3 +1,6 @@
+// Copyright 2025 Stickerbomb Maintainers
+// SPDX-License-Identifier: Apache-2.0
+
 //! v1Alpha1 CRD resources
 
 use std::collections::BTreeMap;

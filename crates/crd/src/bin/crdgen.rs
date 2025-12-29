@@ -1,3 +1,6 @@
+// Copyright 2025 Stickerbomb Maintainers
+// SPDX-License-Identifier: Apache-2.0
+
 //! Generates yaml CRD resources from rust code.
 //! By default this will target the helm chart's `crds` directory!
 //! Designed to be used inside of a mise command that sets the `CRDS_DIR` and `SCHEMA_DIR` environment variables.

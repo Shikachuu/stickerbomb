@@ -1,3 +1,6 @@
+// Copyright 2025 Stickerbomb Maintainers
+// SPDX-License-Identifier: Apache-2.0
+
 //! Operator internals
 
 /// Generic Error for controller lifecycle

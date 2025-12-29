@@ -1,3 +1,6 @@
+// Copyright 2025 Stickerbomb Maintainers
+// SPDX-License-Identifier: Apache-2.0
+
 use k8s_openapi::chrono::{DateTime, Utc};
 use kube::{
     Client,
