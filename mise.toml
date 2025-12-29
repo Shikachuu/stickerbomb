@@ -8,6 +8,7 @@
 "tilt" = "0.36.0"
 "grype" = "0.104.1"
 "cargo:cargo-llvm-cov" = "0.6.21"
+"cargo:cargo-deny" = "0.18.9"
 
 [vars]
 chart_dir = "{{config_root}}/charts/stickerbomb"

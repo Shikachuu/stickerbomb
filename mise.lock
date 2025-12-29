@@ -1,3 +1,7 @@
+[[tools."cargo:cargo-deny"]]
+version = "0.18.9"
+backend = "cargo:cargo-deny"
+
 [[tools."cargo:cargo-llvm-cov"]]
 version = "0.6.21"
 backend = "cargo:cargo-llvm-cov"
@@ -5,24 +9,47 @@ backend = "cargo:cargo-llvm-cov"
 [[tools.grype]]
 version = "0.104.1"
 backend = "aqua:anchore/grype"
+"platforms.linux-arm64" = { checksum = "sha256:069197640efe80f2e6e473df39f7c0e2e290a688f097f5fe2b079f114bfb1b24", url = "https://github.com/anchore/grype/releases/download/v0.104.1/grype_0.104.1_linux_arm64.tar.gz"}
+"platforms.linux-x64" = { checksum = "sha256:2cb820b6c81f88fd6aff3fb4ca5a7161e9ab70af0f27fc5e99cd16deb987cd5f", url = "https://github.com/anchore/grype/releases/download/v0.104.1/grype_0.104.1_linux_amd64.tar.gz"}
+"platforms.macos-arm64" = { checksum = "sha256:8d6e3f677e923965c782582760b43b9691bc2e1ce9d55459ba304402b056d600", url = "https://github.com/anchore/grype/releases/download/v0.104.1/grype_0.104.1_darwin_arm64.tar.gz"}
+"platforms.macos-x64" = { checksum = "sha256:eaed1f6d45587c2164a161c13c55cda64930fd96ba02177d3bd31fbd5b7cf77d", url = "https://github.com/anchore/grype/releases/download/v0.104.1/grype_0.104.1_darwin_amd64.tar.gz"}
+"platforms.windows-x64" = { checksum = "sha256:e3086b6131a5313d357dd68d69b740b5a4a39e75e561ede53ccbda93073d2f97", url = "https://github.com/anchore/grype/releases/download/v0.104.1/grype_0.104.1_windows_amd64.zip"}
 
 [[tools.helm]]
 version = "4.0.1"
 backend = "aqua:helm/helm"
+"platforms.linux-arm64" = { checksum = "sha256:959fa52d34e2e1f0154e3220ed5f22263c8593447647a43af07890bba4b004d1", url = "https://get.helm.sh/helm-v4.0.1-linux-arm64.tar.gz"}
+"platforms.linux-x64" = { checksum = "sha256:e0365548f01ed52a58a1181ad310b604a3244f59257425bb1739499372bdff60", url = "https://get.helm.sh/helm-v4.0.1-linux-amd64.tar.gz"}
 "platforms.macos-arm64" = { checksum = "sha256:8e0b9615cf72a62faaa0cfc0e22115f05bcddfd3d7ee58406ef97bc1ba563ae8", url = "https://get.helm.sh/helm-v4.0.1-darwin-arm64.tar.gz"}
+"platforms.macos-x64" = { checksum = "sha256:a8d1ca46c3ff5484b2b635dfc25832add4f36fdd09cf2a36fb709829c05b4112", url = "https://get.helm.sh/helm-v4.0.1-darwin-amd64.tar.gz"}
+"platforms.windows-x64" = { checksum = "sha256:c250cb663868dea920a8ba12598ae658a8e5ff43a9b527bcad0fbd849025135a", url = "https://get.helm.sh/helm-v4.0.1-windows-amd64.tar.gz"}
 
 [[tools.k3d]]
 version = "5.8.3"
 backend = "aqua:k3d-io/k3d"
+"platforms.linux-arm64" = { checksum = "sha256:0b8110f2229631af7402fb828259330985918b08fefd38b7f1b788a1c8687216", url = "https://github.com/k3d-io/k3d/releases/download/v5.8.3/k3d-linux-arm64"}
+"platforms.linux-x64" = { checksum = "sha256:dbaa79a76ace7f4ca230a1ff41dc7d8a5036a8ad0309e9c54f9bf3836dbe853e", url = "https://github.com/k3d-io/k3d/releases/download/v5.8.3/k3d-linux-amd64"}
 "platforms.macos-arm64" = { checksum = "sha256:8da468daa7dc7cf7cdd4735f90a9bb05179fa27858250f62e3d8cdf5b5ca0698", url = "https://github.com/k3d-io/k3d/releases/download/v5.8.3/k3d-darwin-arm64"}
+"platforms.macos-x64" = { checksum = "sha256:fd0f8e9e8ea4d8bc3674572ca6ed0833b639bf57c43c708616d937377324cfea", url = "https://github.com/k3d-io/k3d/releases/download/v5.8.3/k3d-darwin-amd64"}
+"platforms.windows-x64" = { checksum = "sha256:655d2aadcb1f0a0dd196c5cbc564687ba945a9547c8e82c9fc532051fb260e22", url = "https://github.com/k3d-io/k3d/releases/download/v5.8.3/k3d-windows-amd64.exe"}
 
 [[tools.kubeconform]]
 version = "0.7.0"
 backend = "aqua:yannh/kubeconform"
+"platforms.linux-arm64" = { checksum = "sha256:cc907ccf9e3c34523f0f32b69745265e0a6908ca85b92f41931d4537860eb83c", url = "https://github.com/yannh/kubeconform/releases/download/v0.7.0/kubeconform-linux-arm64.tar.gz"}
+"platforms.linux-x64" = { checksum = "sha256:c31518ddd122663b3f3aa874cfe8178cb0988de944f29c74a0b9260920d115d3", url = "https://github.com/yannh/kubeconform/releases/download/v0.7.0/kubeconform-linux-amd64.tar.gz"}
+"platforms.macos-arm64" = { checksum = "sha256:b5d32b2cb77f9c781c976b20a85e2d0bc8f9184d5d1cfe665a2f31a19f99eeb9", url = "https://github.com/yannh/kubeconform/releases/download/v0.7.0/kubeconform-darwin-arm64.tar.gz"}
+"platforms.macos-x64" = { checksum = "sha256:c6771cc894d82e1b12f35ee797dcda1f7da6a3787aa30902a15c264056dd40d4", url = "https://github.com/yannh/kubeconform/releases/download/v0.7.0/kubeconform-darwin-amd64.tar.gz"}
+"platforms.windows-x64" = { checksum = "sha256:9cb75551d81c909c2241ab383ced2be68363b5bfb15fd989badcc5a63bea5d7e", url = "https://github.com/yannh/kubeconform/releases/download/v0.7.0/kubeconform-windows-amd64.zip"}
 
 [[tools.kubectl]]
 version = "1.34.2"
 backend = "aqua:kubernetes/kubernetes/kubectl"
+"platforms.linux-arm64" = { checksum = "sha256:95df604e914941f3172a93fa8feeb1a1a50f4011dfbe0c01e01b660afc8f9b85", url = "https://dl.k8s.io/v1.34.2/bin/linux/arm64/kubectl"}
+"platforms.linux-x64" = { checksum = "sha256:9591f3d75e1581f3f7392e6ad119aab2f28ae7d6c6e083dc5d22469667f27253", url = "https://dl.k8s.io/v1.34.2/bin/linux/amd64/kubectl"}
+"platforms.macos-arm64" = { checksum = "sha256:8f38d3a38ae317b00ebf90254dc274dd28d8c6eea4a4b30c5cb12d3d27017b6d", url = "https://dl.k8s.io/v1.34.2/bin/darwin/arm64/kubectl"}
+"platforms.macos-x64" = { checksum = "sha256:d2a71bb7dd7238287f2ba4efefbad4f98584170063f7d9e6c842f772d9255d45", url = "https://dl.k8s.io/v1.34.2/bin/darwin/amd64/kubectl"}
+"platforms.windows-x64" = { checksum = "sha256:7d34dcc49a185d64194ff3e952d5621b7da4f5562fa83df5acf305bd1f7de9cc", url = "https://dl.k8s.io/v1.34.2/bin/windows/amd64/kubectl.exe"}
 
 [[tools.rust]]
 version = "1.92.0"
@@ -31,9 +58,17 @@ backend = "core:rust"
 [[tools.tilt]]
 version = "0.36.0"
 backend = "aqua:tilt-dev/tilt"
+"platforms.linux-arm64" = { checksum = "sha256:1fb79ec7609c9d430c29c66d9d1c12c2a58aaf2314bf42d7372105f8ab2eb4ce", url = "https://github.com/tilt-dev/tilt/releases/download/v0.36.0/tilt.0.36.0.linux.arm64.tar.gz"}
+"platforms.linux-x64" = { checksum = "sha256:9ce610083efc76ffa518ec9b001ddb1711b652adce3333f57ffff6be50ad9719", url = "https://github.com/tilt-dev/tilt/releases/download/v0.36.0/tilt.0.36.0.linux.x86_64.tar.gz"}
 "platforms.macos-arm64" = { checksum = "sha256:2e7c99c07d9a06ba8b76bc758c8808f263e12356ea88bba7438f61832e9963df", url = "https://github.com/tilt-dev/tilt/releases/download/v0.36.0/tilt.0.36.0.mac.arm64.tar.gz"}
+"platforms.macos-x64" = { checksum = "sha256:07639c3ec1a22301ce2b4b96f9786074a53ae56714c2fb1940611d60a04d7bc9", url = "https://github.com/tilt-dev/tilt/releases/download/v0.36.0/tilt.0.36.0.mac.x86_64.tar.gz"}
+"platforms.windows-x64" = { checksum = "sha256:d16d482119886c19d65c3f61f3588198f85696d30c08efdf19c4e17624b941ea", url = "https://github.com/tilt-dev/tilt/releases/download/v0.36.0/tilt.0.36.0.windows.x86_64.zip"}
 
 [[tools.yq]]
 version = "4.50.1"
 backend = "aqua:mikefarah/yq"
+"platforms.linux-arm64" = { checksum = "sha256:cf0a663d8e4e00bb61507c5237b95b45a6aaa1fbedac77f4dc8abdadd5e2b745", url = "https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_linux_arm64"}
+"platforms.linux-x64" = { checksum = "sha256:c7a1278e6bbc4924f41b56db838086c39d13ee25dcb22089e7fbf16ac901f0d4", url = "https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_linux_amd64"}
 "platforms.macos-arm64" = { checksum = "sha256:589cd3e27b2a0ae62fc4513c7d18db56203aaf88bf7c480f0cb3d4f4d0ac5514", url = "https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_darwin_arm64"}
+"platforms.macos-x64" = { checksum = "sha256:6c24724c203f8ef0afaa4584d8b7baa150fec7f6d8a493efa49b80f620174119", url = "https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_darwin_amd64"}
+"platforms.windows-x64" = { checksum = "sha256:85c8c1b035c3e7cd10c503f1f00334b6edae18c9fd6b64a06b98d82449e20bf8", url = "https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_windows_amd64.exe"}
