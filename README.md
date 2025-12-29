@@ -1,5 +1,9 @@
 # Stickerbomb
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/11661/badge)](https://www.bestpractices.dev/projects/11661)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![SAST](https://github.com/Shikachuu/stickerbomb/workflows/SAST/badge.svg?branch=main)](https://github.com/Shikachuu/stickerbomb/actions/workflows/codeql.yaml)
+
 Stickerbomb is a kubernetes operator for labeling resources, imagine like putting little stickers on them, hence the name.
 
 The use cases stickerbomb is made for:
@@ -46,6 +50,8 @@ You can use the opentelemtry traces by setting the envrionment variable `OTEL_EX
 To provide a more streamlined interface for this you can set the value of this env var by changing `operator.otel.endpoint` in the values file too.
 
 ## Security
+
+**For vulnerability reporting and our security policy, see [SECURITY.md](SECURITY.md).**
 
 - We provide signed helm releases in Github's OCI repository with signed images as well.
 - By default stickerbomb ships as a rootless and distroless container do minimize the risk of CVEs in container images.

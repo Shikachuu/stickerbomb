@@ -1,0 +1,58 @@
+name: SAST
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+
+  push:
+    branches:
+      - "main"
+    paths:
+      - "crates/**/*"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/**/*.yaml"
+
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - "crates/**/*"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/**/*.yaml"
+
+jobs:
+  analyze:
+    name: "Analyze (${{ matrix.language }})"
+    runs-on: "ubuntu-latest"
+    permissions:
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: rust
+          - language: actions
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@45c373516f557556c15d420e3f5e0aa3d64366bc # v3.31.9
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+
+      - name: Set up mise
+        uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
+        with:
+          shared-key: "codeql"
+
+      - name: Analyze code
+        uses: github/codeql-action/analyze@45c373516f557556c15d420e3f5e0aa3d64366bc # v3.31.9
+        with:
+          category: "/language:${{matrix.language}}"
