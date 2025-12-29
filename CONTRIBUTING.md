@@ -24,6 +24,11 @@ mise run dev    # Bootstrap a k3d cluster and deploy a dev version using Tilt
 4. Deploy some test resources by running `apply-samples` on Tilt UI or running `kubectl apply -f examples/sample-labeler.yaml`
 5. Make sure `mise lint` always passes on the codebase and there are no changes after running it.
 
+### License and Dependency Policy
+
+This project uses [cargo-deny](https://github.com/EmbarkStudios/cargo-deny) to ensure all dependencies use approved open-source licenses. The allowed licenses and dependency policies are defined in `deny.toml`.
+When adding new dependencies, make sure they comply with the approved license list, or add the missing license, however the license you adding MUST be a [FLOSS license](https://dwheeler.com/essays/floss-license-slide.html).
+
 ### Available commands
 
 | Command            | Alias     | Description                                                                                            |
