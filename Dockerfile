@@ -20,6 +20,7 @@ RUN if [ "$BUILD_PROFILE" = "release" ]; then \
     fi
 
 COPY . .
+ENV RUSTFLAGS -D warnings
 RUN if [ "$BUILD_PROFILE" = "release" ]; then \
       cargo build --release --bin stickerbomb && \
       cp target/release/stickerbomb /app/stickerbomb; \

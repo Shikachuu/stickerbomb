@@ -23,6 +23,7 @@ task_output = "quiet"
 quiet = true
 
 [tasks.build]
+env = { RUSTFLAGS = "-D warnings" }
 run = "cargo build --all"
 
 [tasks.test]
