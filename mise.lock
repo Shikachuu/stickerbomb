@@ -15,6 +15,10 @@ backend = "cargo:cargo-deny"
 version = "0.6.21"
 backend = "cargo:cargo-llvm-cov"
 
+[[tools."cargo:git-cliff"]]
+version = "2.11.0"
+backend = "cargo:git-cliff"
+
 [[tools.grype]]
 version = "0.104.1"
 backend = "aqua:anchore/grype"

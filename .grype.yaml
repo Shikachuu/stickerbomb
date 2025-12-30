@@ -1,0 +1,15 @@
+check-for-app-update: false
+
+fail-on-severity: medium
+
+output: ["sarif"]
+
+match:
+  java:
+    using-cpes: true
+
+registry:
+  insecure-skip-tls-verify: false
+  auth:
+    - authority: ghcr.io
+      token: ${GITHUB_TOKEN}
