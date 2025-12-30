@@ -6,7 +6,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 CURRENT_VERSION=$(yq eval '.workspace.package.version' Cargo.toml)
-NEXT_VERSION=$(git cliff --bumped-version 2>/dev/null || echo "")
+NEXT_VERSION=$(git cliff --bumped-version 2>/dev/null | sed 's/^v//' || echo "")
 
 if [ -z "$NEXT_VERSION" ] || [ "$CURRENT_VERSION" = "$NEXT_VERSION" ]; then
     echo "No version change needed (current: $CURRENT_VERSION)"

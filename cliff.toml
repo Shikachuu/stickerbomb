@@ -59,4 +59,5 @@ topo_order = false
 [bump]
 features_always_bump_minor = true
 breaking_always_bump_major = true
+initial_tag = "v0.1.0"
 

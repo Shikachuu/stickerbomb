@@ -77,8 +77,10 @@ run = "bash scripts/release-bump-version.sh"
 [tasks.release-preview]
 description = "Preview next release version and changelog"
 run = """
-  echo "Current version: $(yq eval '.workspace.package.version' Cargo.toml)"
-  echo "Next version: $(git cliff --bumped-version)"
+  CURRENT_VERSION=$(yq eval '.workspace.package.version' Cargo.toml)
+  NEXT_VERSION=$(git cliff --bumped-version 2>/dev/null | sed 's/^v//' || echo "")
+  echo "Current version: $CURRENT_VERSION"
+  echo "Next version: $NEXT_VERSION"
   echo ""
   echo "Release notes:"
   git cliff --unreleased
