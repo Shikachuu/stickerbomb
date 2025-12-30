@@ -10,6 +10,7 @@
 "aqua:google/addlicense" = "1.2.0"
 "cargo:cargo-llvm-cov" = "0.6.21"
 "cargo:cargo-deny" = "0.18.9"
+"cargo:git-cliff" = "2.11.0"
 
 [vars]
 chart_dir = "{{config_root}}/charts/stickerbomb"
@@ -68,3 +69,17 @@ run = [
     "sed -i '' -E 's/(^rust-version = \")[^\"]+(\")/\\1'\"$(yq eval '.toolchain.channel' rust-toolchain.toml)\"'\\2/' Cargo.toml",
     "sed -i '' -E 's/(^\"rust\" = \\{ version = \")[^\"]+(\".*)/\\1'\"$(yq eval '.toolchain.channel' rust-toolchain.toml)\"'\\2/' mise.toml",
 ]
+
+[tasks.release-bump]
+description = "Calculate next version, bump all files, and generate changelog"
+run = "bash scripts/release-bump-version.sh"
+
+[tasks.release-preview]
+description = "Preview next release version and changelog"
+run = """
+  echo "Current version: $(yq eval '.workspace.package.version' Cargo.toml)"
+  echo "Next version: $(git cliff --bumped-version)"
+  echo ""
+  echo "Release notes:"
+  git cliff --unreleased
+"""
