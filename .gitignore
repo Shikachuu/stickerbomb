@@ -10,3 +10,6 @@ lcov.info
 
 # Packaged helm charts
 *.tgz
+
+# Release notes (temporary PR body content)
+RELEASE_NOTES.md
