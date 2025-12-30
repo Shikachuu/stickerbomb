@@ -18,7 +18,7 @@ body = """
 {% for group, commits in commits | group_by(attribute="group") %}
     ### {{ group }}
     {% for commit in commits %}
-        - {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | upper_first }}{% if commit.github.pr_number %} ([#{{ commit.github.pr_number }}](https://github.com/shikachuu/stickerbomb/pull/{{ commit.github.pr_number }})){% endif %}\
+        - {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | upper_first }}{% if commit.remote.pr_number %} ([#{{ commit.remote.pr_number }}](https://github.com/shikachuu/stickerbomb/pull/{{ commit.remote.pr_number }})){% endif %}\
     {% endfor %}
 {% endfor %}\n
 """
@@ -35,19 +35,19 @@ filter_unconventional = true
 split_commits = false
 
 commit_parsers = [
-  { message = "^feat", group = "✨ Features" },
-  { message = "^fix", group = "🐛 Bug Fixes" },
-  { message = "^doc", group = "📚 Documentation" },
-  { message = "^perf", group = "⚡ Performance" },
-  { message = "^refactor", group = "♻️ Refactor" },
-  { message = "^style", group = "💄 Styling" },
-  { message = "^test", group = "✅ Testing" },
-  { message = "^chore\\(release\\)", skip = true },
-  { message = "^chore\\(deps\\)", group = "⬆️ Dependencies" },
-  { message = "^chore", group = "🔧 Miscellaneous Tasks" },
-  { message = "^ci", group = "👷 CI/CD" },
-  { message = "^build", group = "📦 Build" },
-  { body = ".*security", group = "🔒 Security" },
+    { message = "^feat", group = "✨ Features" },
+    { message = "^fix", group = "🐛 Bug Fixes" },
+    { message = "^doc", group = "📚 Documentation" },
+    { message = "^perf", group = "⚡ Performance" },
+    { message = "^refactor", group = "♻️ Refactor" },
+    { message = "^style", group = "💄 Styling" },
+    { message = "^test", group = "✅ Testing" },
+    { message = "^chore\\(release\\)", skip = true },
+    { message = "^chore\\(deps\\)", group = "⬆️ Dependencies" },
+    { message = "^chore", group = "🔧 Miscellaneous Tasks" },
+    { message = "^ci", group = "👷 CI/CD" },
+    { message = "^build", group = "📦 Build" },
+    { body = ".*security", group = "🔒 Security" },
 ]
 
 protect_breaking_commits = false
@@ -59,3 +59,4 @@ topo_order = false
 [bump]
 features_always_bump_minor = true
 breaking_always_bump_major = true
+
