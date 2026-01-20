@@ -29,7 +29,7 @@ RUN if [ "$BUILD_PROFILE" = "release" ]; then \
       cp target/debug/stickerbomb /app/stickerbomb; \
     fi
 
-FROM gcr.io/distroless/cc-debian12:nonroot@sha256:2575808fe33e2a728348040ef2fd6757b0200a73ca8daebd0c258e2601e76c6d
+FROM gcr.io/distroless/cc-debian12:nonroot@sha256:dc65e8ce812dac0f34ca456729ba0cb8a7c1b7c71078be099fb12390a33c4c31
 COPY --from=builder /app/stickerbomb /usr/local/bin/stickerbomb
 EXPOSE 8080
 USER 65532:65532
