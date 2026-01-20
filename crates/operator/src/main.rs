@@ -6,8 +6,10 @@
 use actix_web::{
     App, HttpRequest, HttpResponse, HttpServer, Responder, get, middleware, web::Data,
 };
-use stickerbomb::{State, run, telemetry};
-use tracing::instrument;
+use kube::client;
+use stickerbomb::{controller, lease::run_leader_election, telemetry};
+use tokio::{pin, signal, sync::watch};
+use tracing::{info, instrument};
 
 #[get("/health")]
 async fn health(_: HttpRequest) -> impl Responder {
@@ -15,7 +17,7 @@ async fn health(_: HttpRequest) -> impl Responder {
 }
 
 #[get("/")]
-async fn index(c: Data<State>, _: HttpRequest) -> impl Responder {
+async fn index(c: Data<controller::State>, _: HttpRequest) -> impl Responder {
     let d = c.diagnostics().await;
     HttpResponse::Ok().json(&d)
 }
@@ -25,8 +27,13 @@ async fn index(c: Data<State>, _: HttpRequest) -> impl Responder {
 async fn main() -> anyhow::Result<()> {
     telemetry::init()?;
 
-    let state = State::default();
-    let controller = run(state.clone());
+    let state = controller::State::default();
+    let client = client::Client::try_default().await?;
+
+    let (leader_tx, leader_rx) = watch::channel(false);
+
+    let controller = controller::run(client.clone(), state.clone(), leader_rx);
+    pin!(controller);
 
     let server = HttpServer::new(move || {
         App::new()
@@ -38,13 +45,22 @@ async fn main() -> anyhow::Result<()> {
     .bind("0.0.0.0:8080")?
     .shutdown_timeout(5);
 
-    tokio::join!(controller, server.run()).1?;
+    tokio::select! {
+        () = &mut controller => info!("controller exited"),
+        res = server.run() => res?,
+        () = run_leader_election(client.clone(), leader_tx.clone()) =>  info!("leader election exited"),
+        _ = signal::ctrl_c() => {
+            let _ = leader_tx.send(false);
+            info!("received shutdown signal");
+        },
+    };
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::controller::State;
     use actix_web::{App, test};
 
     #[actix_web::test]

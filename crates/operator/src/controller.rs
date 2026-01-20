@@ -1,6 +1,8 @@
 // Copyright 2025 Stickerbomb Maintainers
 // SPDX-License-Identifier: Apache-2.0
 
+//! Controller components for the k8s operator.
+
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -19,7 +21,7 @@ use regorus::Engine;
 use serde_json::json;
 use stickerbomb_crd::v1_alpha1::RegoRule;
 use stickerbomb_crd::{Labeler, LabelerStatus};
-use tokio::sync::RwLock;
+use tokio::sync::{RwLock, watch};
 use tracing::{Span, debug, error, field, info, instrument, warn};
 
 use crate::diagnostics::Diagnostics;
@@ -68,21 +70,9 @@ impl State {
 }
 
 /// Instantiates and runs a new controller with it's dependencies from the current shared state.
-///
-/// # Panics
-///
-/// Panics if it cannot obtain a k8s api client.
-#[instrument(skip(state))]
-pub async fn run(state: State) {
+#[instrument(skip(state, client))]
+pub async fn run(client: Client, state: State, mut leader_rx: watch::Receiver<bool>) {
     info!("initializing stickerbomb controller");
-
-    // tokio will handle this?
-    #[allow(clippy::expect_used)]
-    let client = Client::try_default()
-        .await
-        .expect("failed to create kube client");
-
-    info!("kubernetes client initialized successfully");
 
     let labelers = Api::<Labeler>::all(client.clone());
     if let Err(e) = labelers.list(&ListParams::default().limit(1)).await {
@@ -93,16 +83,30 @@ pub async fn run(state: State) {
         std::process::exit(1);
     }
 
-    info!("labeler CRD verified, starting controller");
+    loop {
+        if leader_rx.wait_for(|&is_leader| is_leader).await.is_err() {
+            break;
+        }
+        info!("acquired leadership, starting controller");
 
-    Controller::new(labelers, Config::default().any_semantic())
-        .shutdown_on_signal()
-        .run(reconcile, error_policy, state.to_ctrl_context(client).await)
-        .filter_map(|x| async move { std::result::Result::ok(x) })
-        .for_each(|_| futures::future::ready(()))
-        .await;
+        let mut shutdown_rx = leader_rx.clone();
+        let shutdown = async move {
+            let _ = shutdown_rx.wait_for(|&is_leader| !is_leader).await;
+        };
 
-    info!("controller shutdown complete");
+        Controller::new(labelers.clone(), Config::default().any_semantic())
+            .graceful_shutdown_on(shutdown)
+            .run(
+                reconcile,
+                error_policy,
+                state.to_ctrl_context(client.clone()).await,
+            )
+            .filter_map(|x| async move { std::result::Result::ok(x) })
+            .for_each(|_| futures::future::ready(()))
+            .await;
+
+        info!("controller shutdown complete");
+    }
 }
 
 /// Main reconcile loop for the operator, recalls reconcile every 5 mins and processes a `Labeler`

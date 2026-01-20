@@ -1,4 +1,6 @@
 # yaml-language-server: $schema=values.schema.json
+replicaCount: 2
+
 serviceAccount:
   create: true
   automount: true
