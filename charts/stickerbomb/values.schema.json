@@ -7,7 +7,7 @@
     "replicaCount": {
       "type": "integer",
       "description": "Number of replicas for the stickerbomb deployment",
-      "const": 1
+      "default": 2
     },
     "image": {
       "type": "object",
@@ -286,3 +286,4 @@
   ],
   "additionalProperties": false
 }
+

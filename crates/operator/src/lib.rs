@@ -40,13 +40,14 @@ impl From<String> for Error {
 /// Generic result type to be used in the controller
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
-mod controller;
+pub mod controller;
 mod diagnostics;
+
+pub mod lease;
 pub mod telemetry;
 
 use std::num::TryFromIntError;
 
 use kube::core::gvk::ParseGroupVersionError;
 
-pub use crate::controller::*;
 pub use crate::diagnostics::*;
