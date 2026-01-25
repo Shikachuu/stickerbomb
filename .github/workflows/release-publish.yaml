@@ -115,6 +115,10 @@ jobs:
           helm push .helm-dist/stickerbomb-${{ steps.version.outputs.version }}.tgz \
             oci://ghcr.io/shikachuu
 
+      - name: Create local git tag for changelog
+        run: |
+          git tag ${{ steps.version.outputs.tag }}
+
       - name: Generate changelog for release
         run: |
           git cliff --tag ${{ steps.version.outputs.tag }} \
