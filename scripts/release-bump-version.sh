@@ -15,7 +15,11 @@ fi
 
 echo "Bumping version from $CURRENT_VERSION to $NEXT_VERSION"
 
-sed -i.bak "/^\[workspace\.package\]/,/^\[/ s/^version = \".*\"/version = \"$NEXT_VERSION\"/" Cargo.toml && rm Cargo.toml.bak
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "/^\[workspace\.package\]/,/^\[/ s/^version = \".*\"/version = \"$NEXT_VERSION\"/" Cargo.toml
+else
+    sed -i "/^\[workspace\.package\]/,/^\[/ s/^version = \".*\"/version = \"$NEXT_VERSION\"/" Cargo.toml
+fi
 cargo update -p stickerbomb -p stickerbomb-crd --quiet
 
 yq eval -i ".version = \"$NEXT_VERSION\"" charts/stickerbomb/Chart.yaml

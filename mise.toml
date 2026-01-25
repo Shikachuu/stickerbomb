@@ -41,7 +41,11 @@ run = "bash scripts/lint.sh"
 
 [tasks.helm-version]
 hide = true
-run = "yq eval -i \".appVersion = \\\"$(yq eval '.workspace.package.version' Cargo.toml)\\\"\" {{vars.chart_dir}}/Chart.yaml"
+run = """
+  VERSION=$(yq eval '.workspace.package.version' Cargo.toml)
+  yq eval -i \".version = \\\"$VERSION\\\"\" {{vars.chart_dir}}/Chart.yaml
+  yq eval -i \".appVersion = \\\"$VERSION\\\"\" {{vars.chart_dir}}/Chart.yaml
+"""
 sources = ["Cargo.toml"]
 outputs = ["{{vars.chart_dir}}/Chart.yaml"]
 
