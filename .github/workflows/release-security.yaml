@@ -52,13 +52,19 @@ jobs:
             --file grype-source.sarif
         continue-on-error: true
 
-      - name: Upload Grype scan results
-        if: always()
+      - name: Upload container image scan results
+        if: always() && hashFiles('grype-image.sarif') != ''
         uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v4.31.10
         with:
-          sarif_file: |
-            grype-image.sarif
-            grype-source.sarif
+          sarif_file: grype-image.sarif
+          category: grype-image
+
+      - name: Upload source scan results
+        if: always() && hashFiles('grype-source.sarif') != ''
+        uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v4.31.10
+        with:
+          sarif_file: grype-source.sarif
+          category: grype-source
 
       - name: Fail if vulnerabilities found
         if: steps.grype-image.outcome == 'failure' || steps.grype-source.outcome == 'failure'
