@@ -57,7 +57,7 @@ When we release security patches, you'll see them in:
 
 Stickerbomb uses automated security scanning and follows secure development practices:
 
-- **Automated Scanning:** CodeQL (SAST), Grype (vulnerability scanning), secret scanning, and license compliance checking
+- **Automated Scanning:** CodeQL (SAST), Trivy (vulnerability scanning), secret scanning, and license compliance checking
 - **Review Process:** All security findings are reviewed by project maintainers before being closed
 - **Dependencies:** Automated dependency updates via Dependabot with security monitoring
 

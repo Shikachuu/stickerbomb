@@ -2,7 +2,7 @@ ARG BUILD_PROFILE=release
 
 FROM --platform=$BUILDPLATFORM rust:1.93.0-slim-bookworm@sha256:38d9e7c33a262bf1c58aecfbdf778205491d703a2196d4abf459e81cfe9f95e4 AS chef
 WORKDIR /app
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* && cargo install cargo-chef
+RUN apt-get update && apt-get install --no-install-recommends -y git && rm -rf /var/lib/apt/lists/* && cargo install cargo-chef
 
 FROM chef AS planner
 COPY Cargo.toml Cargo.lock ./

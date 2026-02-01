@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   security-scan:
-    name: Grype Vulnerability Scan
+    name: Trivy Vulnerability Scan
     runs-on: ubuntu-latest
     if: contains(github.event.pull_request.labels.*.name, 'release')
     steps:
