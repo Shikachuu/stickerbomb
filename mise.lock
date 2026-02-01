@@ -19,15 +19,6 @@ backend = "cargo:cargo-llvm-cov"
 version = "2.11.0"
 backend = "cargo:git-cliff"
 
-[[tools.grype]]
-version = "0.104.1"
-backend = "aqua:anchore/grype"
-"platforms.linux-arm64" = { checksum = "sha256:069197640efe80f2e6e473df39f7c0e2e290a688f097f5fe2b079f114bfb1b24", url = "https://github.com/anchore/grype/releases/download/v0.104.1/grype_0.104.1_linux_arm64.tar.gz"}
-"platforms.linux-x64" = { checksum = "sha256:2cb820b6c81f88fd6aff3fb4ca5a7161e9ab70af0f27fc5e99cd16deb987cd5f", url = "https://github.com/anchore/grype/releases/download/v0.104.1/grype_0.104.1_linux_amd64.tar.gz"}
-"platforms.macos-arm64" = { checksum = "sha256:8d6e3f677e923965c782582760b43b9691bc2e1ce9d55459ba304402b056d600", url = "https://github.com/anchore/grype/releases/download/v0.104.1/grype_0.104.1_darwin_arm64.tar.gz"}
-"platforms.macos-x64" = { checksum = "sha256:eaed1f6d45587c2164a161c13c55cda64930fd96ba02177d3bd31fbd5b7cf77d", url = "https://github.com/anchore/grype/releases/download/v0.104.1/grype_0.104.1_darwin_amd64.tar.gz"}
-"platforms.windows-x64" = { checksum = "sha256:e3086b6131a5313d357dd68d69b740b5a4a39e75e561ede53ccbda93073d2f97", url = "https://github.com/anchore/grype/releases/download/v0.104.1/grype_0.104.1_windows_amd64.zip"}
-
 [[tools.helm]]
 version = "4.0.1"
 backend = "aqua:helm/helm"
@@ -80,7 +71,11 @@ backend = "aqua:tilt-dev/tilt"
 [[tools.trivy]]
 version = "0.69.0"
 backend = "aqua:aquasecurity/trivy"
+"platforms.linux-arm64" = { checksum = "sha256:425e883f37cad0b512478df2803f58532e7d235267303375a3d0f97e4790a1ca", url = "https://github.com/aquasecurity/trivy/releases/download/v0.69.0/trivy_0.69.0_Linux-ARM64.tar.gz"}
+"platforms.linux-x64" = { checksum = "sha256:fff5813d6888fa6f8bd40042a08c4f072b3e65aec9f13dd9ab1d7b26146ad046", url = "https://github.com/aquasecurity/trivy/releases/download/v0.69.0/trivy_0.69.0_Linux-64bit.tar.gz"}
 "platforms.macos-arm64" = { checksum = "sha256:bd35348d963d3f661ff4d7d138e65a75fedbfade0378689f3a349c824c6e5b75", url = "https://github.com/aquasecurity/trivy/releases/download/v0.69.0/trivy_0.69.0_macOS-ARM64.tar.gz"}
+"platforms.macos-x64" = { checksum = "sha256:4264e4fcc73259de36a68c112a586d65bf6cd488ef2aea857f37d00d8cb5c4e6", url = "https://github.com/aquasecurity/trivy/releases/download/v0.69.0/trivy_0.69.0_macOS-64bit.tar.gz"}
+"platforms.windows-x64" = { checksum = "sha256:4b34440f0a854428e846b1d2329eede3f0663bec8eff865ae2dffca42542a076", url = "https://github.com/aquasecurity/trivy/releases/download/v0.69.0/trivy_0.69.0_windows-64bit.zip"}
 
 [[tools.yq]]
 version = "4.50.1"
