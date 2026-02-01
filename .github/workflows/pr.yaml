@@ -82,7 +82,7 @@ jobs:
         run: mise test
 
       - name: Report code coverage
-        uses: zgosalvez/github-actions-report-lcov@c18f1c00419937aa086a9a29d82a03912d160f4d # v6.0.0
+        uses: zgosalvez/github-actions-report-lcov@4eb99c09644c30cceb609413620bd9e1bf80ee79 # v6.0.1
         with:
           coverage-files: lcov.info
           artifact-name: code-coverage-report
