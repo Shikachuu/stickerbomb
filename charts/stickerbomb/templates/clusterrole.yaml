@@ -18,7 +18,7 @@ rules:
     resources: ["leases"]
     verbs: ["get", "create", "update"]
   {{- range .Values.clusterRoles.rules }}
-  - apiGroups: {{ .apiGroups }}
-    resources: {{ .resources }}
+  - apiGroups: {{- .apiGroups | toYaml | nindent 6 }}
+    resources: {{- .resources | toYaml | nindent 6 }}
     verbs: ["get", "list", "watch", "patch"]
   {{- end }}
