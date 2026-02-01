@@ -53,9 +53,9 @@ resources:
 clusterRoles:
   rules:
     - apiGroups:
-        - ""
+        - "*"
       resources:
-        - ""
+        - "*"
 
 # -- Node selector for pod assignment
 nodeSelector: {}
