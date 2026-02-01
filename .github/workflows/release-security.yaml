@@ -37,39 +37,44 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Scan container image
-        id: grype-image
+        id: trivy-image
         run: |
-          grype stickerbomb:scan \
-            --fail-on medium \
-            --output sarif \
-            --file grype-image.sarif
+          trivy image \
+            --severity MEDIUM,HIGH,CRITICAL \
+            --format sarif \
+            --output trivy-image.sarif \
+            --exit-code 1 \
+            stickerbomb:scan
         continue-on-error: true
 
       - name: Scan source dependencies
-        id: grype-source
+        id: trivy-source
         run: |
-          grype dir:. \
-            --fail-on medium \
-            --output sarif \
-            --file grype-source.sarif
+          trivy fs \
+            --scanners vuln,misconfig,secret \
+            --severity MEDIUM,HIGH,CRITICAL \
+            --format sarif \
+            --output trivy-source.sarif \
+            --exit-code 1 \
+            .
         continue-on-error: true
 
       - name: Upload container image scan results
-        if: always() && hashFiles('grype-image.sarif') != ''
+        if: always() && hashFiles('trivy-image.sarif') != ''
         uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v4.31.10
         with:
-          sarif_file: grype-image.sarif
-          category: grype-image
+          sarif_file: trivy-image.sarif
+          category: trivy-image
 
       - name: Upload source scan results
-        if: always() && hashFiles('grype-source.sarif') != ''
+        if: always() && hashFiles('trivy-source.sarif') != ''
         uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v4.31.10
         with:
-          sarif_file: grype-source.sarif
-          category: grype-source
+          sarif_file: trivy-source.sarif
+          category: trivy-source
 
       - name: Fail if vulnerabilities found
-        if: steps.grype-image.outcome == 'failure' || steps.grype-source.outcome == 'failure'
+        if: steps.trivy-image.outcome == 'failure' || steps.trivy-source.outcome == 'failure'
         run: |
           echo "::error::Medium or higher vulnerabilities found. Release blocked."
           exit 1

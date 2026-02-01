@@ -149,58 +149,36 @@
       },
       "additionalProperties": false
     },
-    "clusterRules": {
+    "clusterRoles": {
       "type": "object",
       "description": "Cluster-wide RBAC rules configuration",
-      "required": ["strict"],
-      "oneOf": [
-        {
-          "description": "Strict mode disabled - rules not allowed",
-          "properties": {
-            "strict": {
-              "type": "boolean",
-              "const": false,
-              "description": "Enable strict mode for cluster rules validation"
-            }
-          },
-          "additionalProperties": false
-        },
-        {
-          "description": "Strict mode enabled - rules required",
-          "properties": {
-            "strict": {
-              "type": "boolean",
-              "const": true,
-              "description": "Enable strict mode for cluster rules validation"
-            },
-            "rules": {
-              "type": "array",
-              "description": "List of Kubernetes API resources to watch and manage",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "apiGroups": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "resources": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "required": ["apiGroups", "resources"],
-                "additionalProperties": false
+      "additionalProperties": false,
+      "required": ["rules"],
+      "properties": {
+        "rules": {
+          "type": "array",
+          "description": "List of Kubernetes API resources to watch and manage",
+          "items": {
+            "type": "object",
+            "properties": {
+              "apiGroups": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "resources": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
-            }
-          },
-          "required": ["strict", "rules"],
-          "additionalProperties": false
+            },
+            "required": ["apiGroups", "resources"],
+            "additionalProperties": false
+          }
         }
-      ]
+      }
     },
     "nodeSelector": {
       "type": "object",
@@ -281,9 +259,8 @@
     "image",
     "serviceAccount",
     "resources",
-    "clusterRules",
+    "clusterRoles",
     "operator"
   ],
   "additionalProperties": false
 }
-

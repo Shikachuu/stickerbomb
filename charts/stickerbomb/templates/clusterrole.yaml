@@ -17,14 +17,8 @@ rules:
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]
     verbs: ["get", "create", "update"]
-  {{- if .Values.clusterRules.strict }}
-  {{- range .Values.clusterRules.rules }}
+  {{- range .Values.clusterRoles.rules }}
   - apiGroups: {{ .apiGroups }}
     resources: {{ .resources }}
-    verbs: ["get", "list", "watch", "patch"]
-  {{- end }}
-  {{- else }}
-  - apiGroups: ["*"]
-    resources: ["*"]
     verbs: ["get", "list", "watch", "patch"]
   {{- end }}
