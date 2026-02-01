@@ -17,7 +17,11 @@ The use cases stickerbomb is made for:
 
 ## Getting started
 
-- Install the official helm chart to your cluster. (Wait for the tests to pass, it will make sure stickerbomb can actually label stuff.)
+- Install the official helm chart to your cluster:
+  ```bash
+  helm install stickerbomb oci://ghcr.io/shikachuu/charts/stickerbomb --version 0.1.0
+  ```
+  Wait for the tests to pass, it will make sure stickerbomb can actually label stuff.
 - Get some context on the target resource you wish to label. Stikerbomb uses you the target resource's json object as input for your rego conditions,
   it's always a great idea to have some solid understaindg of the data you can use, run `kubectl get <resourceKind> <objectName> -o json` to check the json representation.
 - Create a `Labeler` resource, you can find plenty of examples in the `examples` directory.
@@ -61,5 +65,15 @@ To provide a more streamlined interface for this you can set the value of this e
 - The helm chart is sipped with a strick network policy that will always be installed if you have the `NetworkPolicy` capability in your cluster.
   It denies every egress and ingress calls from the pod except egress to port `443` and `53` targeting the `kube-system` namespace and ingress traffic on `8080`.
 - The operator's deployment always run as non-root with fully dropped capabilites!
-- Stickerbomb ships with it's own service account wiht cluster role bindings, by default however the operator can patch ANY resources in the cluster.
-  You can limit the resources it can access by switching `clusterRole.strict` to true and adding your rules to `clusterRole.rules`.
+- Stickerbomb ships with its own service account with cluster role bindings. **By default, the operator has permission to patch ANY resources in the cluster** (using empty string `""` for both `apiGroups` and `resources` in `clusterRoles.rules`).
+
+  **STRONGLY RECOMMENDED:** Restrict the operator's permissions to only the resource types you actually need to label. Configure `clusterRoles.rules` with explicit API groups and resources following the principle of least privilege:
+  ```yaml
+  clusterRoles:
+    rules:
+      - apiGroups: [""]  # core API group
+        resources: ["pods", "namespaces"]
+      - apiGroups: ["apps"]
+        resources: ["deployments", "statefulsets"]
+  ```
+  This minimizes the security impact if the operator is compromised and ensures it can only modify the resources you explicitly allow.

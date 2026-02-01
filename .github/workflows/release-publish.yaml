@@ -33,6 +33,11 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
 
+      - name: Create local git tag for changelog
+        run: |
+          git tag ${{ steps.version.outputs.tag }}
+          git push origin ${{ steps.version.outputs.tag }}
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
 
@@ -78,24 +83,21 @@ jobs:
           sbom: true
           provenance: true
 
-      - name: Install Syft for SBOM generation
-        uses: anchore/sbom-action/download-syft@62ad5284b8ced813296287a0b63906cb364b73ee # v0.22.0
-
       - name: Generate SPDX SBOM for amd64
         run: |
-          syft packages \
-            ghcr.io/shikachuu/stickerbomb:${{ steps.version.outputs.version }} \
+          trivy image \
             --platform linux/amd64 \
-            -o spdx-json \
-            > stickerbomb-${{ steps.version.outputs.version }}-amd64.spdx.json
+            --format spdx-json \
+            --output stickerbomb-${{ steps.version.outputs.version }}-amd64.spdx.json \
+            ghcr.io/shikachuu/stickerbomb:${{ steps.version.outputs.version }}
 
       - name: Generate SPDX SBOM for arm64
         run: |
-          syft packages \
-            ghcr.io/shikachuu/stickerbomb:${{ steps.version.outputs.version }} \
+          trivy image \
             --platform linux/arm64 \
-            -o spdx-json \
-            > stickerbomb-${{ steps.version.outputs.version }}-arm64.spdx.json
+            --format spdx-json \
+            --output stickerbomb-${{ steps.version.outputs.version }}-arm64.spdx.json \
+            ghcr.io/shikachuu/stickerbomb:${{ steps.version.outputs.version }}
 
       - name: Package Helm chart
         run: |
@@ -113,11 +115,7 @@ jobs:
       - name: Push Helm chart to GHCR OCI
         run: |
           helm push .helm-dist/stickerbomb-${{ steps.version.outputs.version }}.tgz \
-            oci://ghcr.io/shikachuu
-
-      - name: Create local git tag for changelog
-        run: |
-          git tag ${{ steps.version.outputs.tag }}
+            oci://ghcr.io/shikachuu/charts
 
       - name: Generate changelog for release
         run: |
@@ -136,4 +134,3 @@ jobs:
             .helm-dist/stickerbomb-${{ steps.version.outputs.version }}.tgz \
             stickerbomb-${{ steps.version.outputs.version }}-amd64.spdx.json \
             stickerbomb-${{ steps.version.outputs.version }}-arm64.spdx.json
-

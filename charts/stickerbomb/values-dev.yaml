@@ -6,9 +6,12 @@ serviceAccount:
   automount: true
   name: "stickerbomb"
 
-clusterRules:
-  strict: false
-
+clusterRoles:
+  rules:
+    - apiGroups:
+        - "*"
+      resources:
+        - "*"
 image:
   repository: stickerbomb
   pullPolicy: Always

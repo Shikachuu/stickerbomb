@@ -57,11 +57,21 @@ When we release security patches, you'll see them in:
 
 Stickerbomb uses automated security scanning and follows secure development practices:
 
-- **Automated Scanning:** CodeQL (SAST), Grype (vulnerability scanning), secret scanning, and license compliance checking
+- **Automated Scanning:** CodeQL (SAST), Trivy (vulnerability scanning), secret scanning, and license compliance checking
 - **Review Process:** All security findings are reviewed by project maintainers before being closed
 - **Dependencies:** Automated dependency updates via Dependabot with security monitoring
 
 For details on our security architecture, see the existing [Security section in README.md](README.md#security).
+
+### Deployment Security Best Practices
+
+**IMPORTANT:** When deploying Stickerbomb, follow the principle of least privilege:
+
+- **Restrict RBAC permissions:** The default configuration grants permission to patch ANY cluster resource. You should **always** configure `clusterRoles.rules` to only include the specific API groups and resources you need to label.
+- **Review permissions regularly:** Periodically audit your `clusterRoles.rules` configuration to ensure you're not granting unnecessary permissions.
+- **Use namespace-scoped resources when possible:** If you only need to label resources in specific namespaces, consider using namespace-scoped roles instead of cluster roles (requires custom deployment configuration).
+
+See the [Security section in README.md](README.md#security) for configuration examples.
 
 ## Secrets Management
 

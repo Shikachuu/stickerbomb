@@ -50,9 +50,12 @@ resources:
     memory: 64Mi
 
 # -- Cluster-wide RBAC rules configuration
-clusterRules:
-  # -- Enable strict mode for cluster rules validation
-  strict: false
+clusterRoles:
+  rules:
+    - apiGroups:
+        - "*"
+      resources:
+        - "*"
 
 # -- Node selector for pod assignment
 nodeSelector: {}

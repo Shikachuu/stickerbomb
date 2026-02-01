@@ -1,4 +1,19 @@
 stickerbomb operator installed successfully!
+{{- $rule := index .Values.clusterRoles.rules 0 }}
+{{- $apiGroup := index $rule.apiGroups 0 }}
+{{- $resource := index $rule.resources 0 }}
+{{- if or (and (eq $apiGroup "") (eq $resource "")) (and (eq $apiGroup "*") (eq $resource "*")) }}
+
+SECURITY REMINDER: The operator currently has permission to patch ANY cluster resource.
+For production deployments, restrict permissions by configuring clusterRoles.rules:
+
+  helm upgrade {{ .Release.Name }} oci://ghcr.io/shikachuu/charts/stickerbomb \
+    --set clusterRoles.rules[0].apiGroups[0]="" \
+    --set clusterRoles.rules[0].resources[0]="pods" \
+    --set clusterRoles.rules[0].resources[1]="namespaces"
+
+See values.yaml for more examples and the security documentation for details.
+{{- end }}
 
 To create a Labeler resource:
 
