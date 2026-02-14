@@ -23,7 +23,7 @@ thiserror = "2.0.18"
 tokio = { version = "1.49.0", features = ["full"] }
 futures = "0.3.31"
 actix-web = "4.12.1"
-regorus = "0.5.0"
+regorus = "0.9.1"
 tracing = { version = "0.1.44", features = ["attributes"] }
 tracing-subscriber = { version = "0.3.22", features = ["env-filter", "json"] }
 opentelemetry = { version = "0.31.0", features = ["trace"] }
@@ -34,7 +34,7 @@ opentelemetry-otlp = { version = "0.31.0", default-features = false, features = 
 ] }
 tracing-opentelemetry = "0.32.0"
 opentelemetry-resource-detectors = "0.10.0"
-kube-leader-election = "0.42.0"
+kube-leader-election = "0.43.0"
 
 [dev-dependencies]
 temp-env = "0.3"
